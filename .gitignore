@@ -1,7 +1,0 @@
-__pycache__/
-.vscode/
-simgui-ds.json
-simgui-window.json
-simgui.json
-.deploy_cfg
-.installer_config
