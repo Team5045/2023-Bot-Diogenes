@@ -30,48 +30,60 @@ py -3 -m robotpy_installer install robotpy[rev]
 
 # Import all the necessary libraries
 import wpilib
-import wpilib.drive
-import rev
+from ctre import WPI_TalonSRX
+from magicbot import MagicRobot
+from networktables import NetworkTables, NetworkTable
+
+from components.drivetrain import DriveTrain
+
+INPUT_SENSITIVITY = .3
+
+MagicRobot.control_loop_wait_time = 0.2
 
 
+class SpartaBot(MagicRobot):
+    # a DriveTrain instance is automatically created by MagicRobot
+    drivetrain: DriveTrain
 
+    def createObjects(self):
+        '''Create motors and stuff here'''
 
-class MyRobot(wpilib.TimedRobot):
-    """
-    Main framework object that inherits from wpilib.TimedRobot
-    """
+        NetworkTables.initialize(server='roborio-5045-frc.local')
+        self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-    def robotInit(self):
-        """
-        This function is called upon program startup and
-        should be used for any initialization code.
-        """
+        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
-        self.controller = wpilib.XboxController(0)
+        self.talon_L_1 = WPI_TalonSRX(6)
+        self.talon_L_2 = WPI_TalonSRX(9)
 
-        self.boom_motor = rev.CANSparkMax(0, rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed)
-        self.extender_motor = rev.CANSparkMax(1, rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed)
+        self.talon_R_1 = WPI_TalonSRX(1)
+        self.talon_R_2 = WPI_TalonSRX(5)
 
+    def disabledPeriodic(self):
+        self.sd.putValue("Mode", "Disabled")
 
-    def autonomousInit(self):
-        """This function is run once each time the robot enters autonomous mode."""
-        # trust auton work
-
-    def autonomousPeriodic(self):
-        """This function is called periodically during autonomous."""
-        # this will def make auton actually work
+    def teleopInit(self):
+        '''Called when teleop starts; optional'''
+        self.sd.putValue("Mode", "Teleop")
 
     def teleopPeriodic(self):
-        """This function is called periodically during operator control."""
+        '''Called on each iteration of the control loop'''
+        angle = self.drive_controller.getRightX()
+        # print(self.drive_controller.getRawAxis(0))
+        speed = self.drive_controller.getLeftY()
 
-        # Print both controller values
-        self.X = self.controller.getLeftTriggerAxis()
-        self.Y = self.controller.getRightTriggerAxis()
+        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+            # inverse values to get inverse controls
+            self.drivetrain.set_motors(-speed, -angle)
+            self.sd.putValue('Drivetrain: ', 'moving')
 
-        print(f"Left Trigger: {self.X}\nRight Trigger: {self.Y}")
+        else:
+            # reset value to make robot stop moving
+            self.drivetrain.set_motors(0.0, 0.0)
+            self.sd.putValue('Drivetrain: ', 'static')
+
+        # self.drivetrain's execute() method is automatically called
 
 
-
-
-if __name__ == "__main__":
-    wpilib.run(MyRobot)
+if __name__ == '__main__':
+    wpilib.run(SpartaBot)
