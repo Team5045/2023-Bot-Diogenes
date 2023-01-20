@@ -26,6 +26,7 @@ from components.drivetrain import DriveTrain
 
 INPUT_SENSITIVITY = .3
 
+MagicRobot.control_loop_wait_time = 0.2
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
