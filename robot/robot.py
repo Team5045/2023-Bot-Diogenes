@@ -47,7 +47,8 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
 
-        self.boom_spark = wpilib.Spark(0) # TODO get actual spark controller
+        self.boom_extender_spark = wpilib.Spark(0) # TODO get actual spark controller
+        self.boom_rotator_spark = wpilib.Spark(1) 
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
