@@ -2,9 +2,10 @@ import wpilib
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
-
+from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
-from components.Grabber import Grabber
+
+import time
 
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
@@ -18,8 +19,8 @@ from components.Grabber import Grabber
 '''
 
 # Push code to RoboRIO (only after imaging)
-'''python py/robot/robot.py deploy --skip-tests'''
-'''py py/robot/robot.py deploy --skip-tests --no-version-check'''
+'''python robot/robot.py deploy --skip-tests'''
+'''py robot/robot.py deploy --skip-tests --no-version-check'''
 
 # if ctre not found
 '''py -3 -m pip install -U robotpy[ctre]'''
@@ -27,7 +28,7 @@ from components.Grabber import Grabber
 
 INPUT_SENSITIVITY = .3
 
-MagicRobot.control_loop_wait_time = 0.2
+MagicRobot.control_loop_wait_time = 0.05
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
@@ -35,6 +36,9 @@ class SpartaBot(MagicRobot):
 
     def createObjects(self):
         '''Create motors and stuff here'''
+
+        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
+        
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
@@ -46,6 +50,12 @@ class SpartaBot(MagicRobot):
 
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
+
+        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+
+
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -69,6 +79,19 @@ class SpartaBot(MagicRobot):
             # reset value to make robot stop moving
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
+        
+        if self.drive_controller.getBButtonPressed():
+            self.solenoid.toggle()
+            
+            if (self.compressor.isEnabled()):
+                self.compressor.disable()
+            else:
+                self.compressor.enableDigital()
+
+        if self.drive_controller.getAButton():
+            self.solenoid.toggle()
+
+
         
         # self.drivetrain's execute() method is automatically called
 
