@@ -53,7 +53,7 @@ class SpartaBot(MagicRobot):
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
 
 
 
@@ -90,6 +90,7 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getAButton():
             self.solenoid.toggle()
+            
 
 
         
