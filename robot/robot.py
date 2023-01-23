@@ -4,6 +4,7 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 
 from components.drivetrain import DriveTrain
+from components.Grabber import Grabber
 
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
