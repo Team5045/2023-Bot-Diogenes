@@ -2,9 +2,10 @@ import wpilib
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
-
+from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
-from components.Grabber import Grabber
+
+import time
 
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
@@ -36,16 +37,25 @@ class SpartaBot(MagicRobot):
     def createObjects(self):
         '''Create motors and stuff here'''
 
+        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
+
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller = wpilib.XboxController(0) #0 works for sim?
+        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonSRX(6)
         self.talon_L_2 = WPI_TalonSRX(9)
 
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
+
+        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.compressor.setClosedLoopControl(True)
+        self.compressor.start()
+
+        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid.set(DoubleSolenoid.Value.kReverse)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -69,6 +79,18 @@ class SpartaBot(MagicRobot):
             # reset value to make robot stop moving
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
+
+        if self.drive_controller.getBButtonPressed():
+            self.solenoid.toggle()
+
+            if (self.compressor.isEnabled()):
+                self.compressor.disable()
+            else:
+                self.compressor.enableDigital()
+
+        if self.drive_controller.getAButton():
+            self.drive_controller.
+            self.solenoid.toggle()
         
         # self.drivetrain's execute() method is automatically called
 
