@@ -80,16 +80,15 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
         
-        if self.drive_controller.getBButtonPressed():
-            self.solenoid.toggle()
-            
+        if self.drive_controller.getBButtonReleased():
             if (self.compressor.isEnabled()):
                 self.compressor.disable()
             else:
                 self.compressor.enableDigital()
 
-        if self.drive_controller.getAButton():
+        if self.drive_controller.getAButtonReleased():
             self.solenoid.toggle()
+            print(self.solenoid.get())
             
 
 
