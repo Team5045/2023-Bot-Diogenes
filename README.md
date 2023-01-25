@@ -1,7 +1,7 @@
 # 2023-Bot-Diogenes
 This repository contains the source code for Team 5045's 2023 season robot.
 
-# Liscense
+# License
 The MIT License (MIT)
 
 Copyright (c) 2023 White Station High School Robotics Team 5045
