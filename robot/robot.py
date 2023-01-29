@@ -4,6 +4,7 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
+from components.pneumatics import Pneumatics
 
 import time
 
@@ -33,13 +34,11 @@ class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
     drivetrain: DriveTrain
+    pneumatics: Pneumatics
 
     def createObjects(self):
         '''Create motors and stuff here'''
-
-        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
-        
-
+        #drivetrain stuff
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
@@ -51,10 +50,7 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
 
-        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
-
+        #Pneumatics
 
 
     def disabledPeriodic(self):
@@ -97,3 +93,6 @@ class SpartaBot(MagicRobot):
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
+
+#commands to remember
+#py -3 robot.py sim
