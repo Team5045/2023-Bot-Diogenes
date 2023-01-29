@@ -4,8 +4,12 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
+<<<<<<< HEAD
 from components.pneumatics import Pneumatics
 
+=======
+from components.Grabber import Grabber
+>>>>>>> main
 import time
 
 # Download and install stuff on the RoboRIO after imaging
@@ -72,6 +76,7 @@ class SpartaBot(MagicRobot):
                 self.drivetrain.set_motors(-speed, -angle)
                 self.sd.putValue('Drivetrain: ', 'moving')
 
+<<<<<<< HEAD
             else:
                 # reset value to make robot stop moving
                 self.drivetrain.set_motors(0.0, 0.0)
@@ -94,7 +99,26 @@ class SpartaBot(MagicRobot):
 
 
         
+=======
+        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+            # inverse values to get inverse controls
+            self.drivetrain.set_motors(-speed, -angle)
+            self.sd.putValue('Drivetrain: ', 'moving')
+
+        else:
+            # reset value to make robot stop moving
+            self.drivetrain.set_motors(0.0, 0.0)
+            self.sd.putValue('Drivetrain: ', 'static')
+
+>>>>>>> main
         # self.drivetrain's execute() method is automatically called
+
+        if self.drive_controller.getBButtonReleased():
+            Grabber.turn_off_compressor(self)
+        
+        if self.drive_controller.getAButtonReleased():
+            Grabber.solenoid_toggle(self)
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
