@@ -4,12 +4,7 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
-<<<<<<< HEAD
-from components.pneumatics import Pneumatics
-
-=======
 from components.Grabber import Grabber
->>>>>>> main
 import time
 
 # Download and install stuff on the RoboRIO after imaging
@@ -38,7 +33,6 @@ class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
     drivetrain: DriveTrain
-    pneumatics: Pneumatics
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -54,9 +48,6 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
 
-        #Pneumatics
-        #In pneumatics.py
-
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -70,55 +61,27 @@ class SpartaBot(MagicRobot):
         angle = self.drive_controller.getRightX()
         #print(self.drive_controller.getRawAxis(0))
         speed = self.drive_controller.getLeftY()
-        try:
+        with self.consumeExceptions():
             if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
                 # inverse values to get inverse controls
                 self.drivetrain.set_motors(-speed, -angle)
                 self.sd.putValue('Drivetrain: ', 'moving')
 
-<<<<<<< HEAD
             else:
                 # reset value to make robot stop moving
                 self.drivetrain.set_motors(0.0, 0.0)
                 self.sd.putValue('Drivetrain: ', 'static')
-        except:
-            self.onExcetption() #error swallower
-        
-        try:
+        with self.consumeExceptions():
             if self.drive_controller.getBButtonReleased():
-                if (self.compressor.isEnabled()):
-                    self.compressor.disable()
-                else:
-                    self.compressor.enableDigital()
-
+                Grabber.turn_off_compressor(self)
+            
             if self.drive_controller.getAButtonReleased():
-                self.solenoid.toggle()
-                print(self.solenoid.get())
-        except:
-            self.onException()
+                Grabber.solenoid_toggle(self)
+            
 
 
         
-=======
-        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, -angle)
-            self.sd.putValue('Drivetrain: ', 'moving')
-
-        else:
-            # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
-
->>>>>>> main
         # self.drivetrain's execute() method is automatically called
-
-        if self.drive_controller.getBButtonReleased():
-            Grabber.turn_off_compressor(self)
-        
-        if self.drive_controller.getAButtonReleased():
-            Grabber.solenoid_toggle(self)
-
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
