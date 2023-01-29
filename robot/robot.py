@@ -51,6 +51,7 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonSRX(5)
 
         #Pneumatics
+        #In pneumatics.py
 
 
     def disabledPeriodic(self):
@@ -65,27 +66,31 @@ class SpartaBot(MagicRobot):
         angle = self.drive_controller.getRightX()
         #print(self.drive_controller.getRawAxis(0))
         speed = self.drive_controller.getLeftY()
+        try:
+            if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+                # inverse values to get inverse controls
+                self.drivetrain.set_motors(-speed, -angle)
+                self.sd.putValue('Drivetrain: ', 'moving')
 
-        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, -angle)
-            self.sd.putValue('Drivetrain: ', 'moving')
-
-        else:
-            # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
-        
-        if self.drive_controller.getBButtonReleased():
-            if (self.compressor.isEnabled()):
-                self.compressor.disable()
             else:
-                self.compressor.enableDigital()
+                # reset value to make robot stop moving
+                self.drivetrain.set_motors(0.0, 0.0)
+                self.sd.putValue('Drivetrain: ', 'static')
+        except:
+            self.onExcetption() #error swallower
+        
+        try:
+            if self.drive_controller.getBButtonReleased():
+                if (self.compressor.isEnabled()):
+                    self.compressor.disable()
+                else:
+                    self.compressor.enableDigital()
 
-        if self.drive_controller.getAButtonReleased():
-            self.solenoid.toggle()
-            print(self.solenoid.get())
-            
+            if self.drive_controller.getAButtonReleased():
+                self.solenoid.toggle()
+                print(self.solenoid.get())
+        except:
+            self.onException()
 
 
         
