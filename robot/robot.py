@@ -89,7 +89,6 @@ class SpartaBot(MagicRobot):
                 self.compressor.enableDigital()
 
         if self.drive_controller.getAButton():
-            self.drive_controller.
             self.solenoid.toggle()
         
         # self.drivetrain's execute() method is automatically called
