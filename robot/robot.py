@@ -2,7 +2,7 @@ import wpilib
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
-from wpilib import Solenoid, DoubleSolenoid
+from wpilib import DoubleSolenoid
 from components.drivetrain import DriveTrain
 
 import time
@@ -59,8 +59,8 @@ class SpartaBot(MagicRobot):
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
 
-        self.boom_extender_spark = wpilib.Spark(0) # TODO get actual spark controller
-        self.boom_rotator_spark = wpilib.Spark(1) 
+        self.boom_extender_spark = wpilib.Spark(1) # TODO get actual spark controller
+        self.boom_rotator_spark = wpilib.Spark(2) 
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -98,14 +98,17 @@ class SpartaBot(MagicRobot):
             extend_speed -= self.drive_controller.getLeftTriggerAxis()
             extend_speed += self.drive_controller.getRightTriggerAxis()
 
-            self.boom_arm.set_extender(extend_speed)
+            #self.boom_arm.set_extender(extend_speed)
+            self.boom_extender_spark.set(0.1)
+
         else:
             rotation_speed = 0
 
             rotation_speed -= self.drive_controller.getLeftTriggerAxis()
             rotation_speed += self.drive_controller.getRightTriggerAxis()
 
-            self.boom_arm.set_rotator(rotation_speed)
+            self.boom_rotator_spark.set(0.1)
+            print(rotation_speed)
         
 
         # self.drivetrain's execute() method is automatically called
