@@ -4,7 +4,7 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
-
+from components.Grabber import Grabber
 import time
 
 # Download and install stuff on the RoboRIO after imaging
@@ -19,8 +19,8 @@ import time
 '''
 
 # Push code to RoboRIO (only after imaging)
-'''python py/robot/robot.py deploy --skip-tests'''
-'''py py/robot/robot.py deploy --skip-tests --no-version-check'''
+'''python robot/robot.py deploy --skip-tests'''
+'''py robot/robot.py deploy --skip-tests --no-version-check'''
 
 # if ctre not found
 '''py -3 -m pip install -U robotpy[ctre]'''
@@ -28,7 +28,7 @@ import time
 
 INPUT_SENSITIVITY = .3
 
-MagicRobot.control_loop_wait_time = 0.2
+MagicRobot.control_loop_wait_time = 0.05
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
@@ -38,11 +38,12 @@ class SpartaBot(MagicRobot):
         '''Create motors and stuff here'''
 
         PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
+        
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller = wpilib.XboxController(0) #0 works for sim?
 
         self.talon_L_1 = WPI_TalonSRX(6)
         self.talon_L_2 = WPI_TalonSRX(9)
@@ -51,11 +52,10 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonSRX(5)
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.compressor.setClosedLoopControl(True)
-        self.compressor.start()
-
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kReverse)
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
+
+
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -80,18 +80,14 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
-        if self.drive_controller.getBButtonPressed():
-            self.solenoid.toggle()
-
-            if (self.compressor.isEnabled()):
-                self.compressor.disable()
-            else:
-                self.compressor.enableDigital()
-
-        if self.drive_controller.getAButton():
-            self.solenoid.toggle()
-        
         # self.drivetrain's execute() method is automatically called
+
+        if self.drive_controller.getBButtonReleased():
+            Grabber.turn_off_compressor(self)
+        
+        if self.drive_controller.getAButtonReleased():
+            Grabber.solenoid_toggle(self)
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
