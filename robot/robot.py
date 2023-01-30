@@ -2,10 +2,12 @@ import wpilib
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
-
+from wpilib import Solenoid, DoubleSolenoid
 from components.drivetrain import DriveTrain
+
+import time
 from components.boom import Boom
-# from components.Grabber import Grabber
+from components.Grabber import Grabber
 
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
@@ -19,8 +21,8 @@ from components.boom import Boom
 '''
 
 # Push code to RoboRIO (only after imaging)
-'''python py/robot/robot.py deploy --skip-tests'''
-'''py py/robot/robot.py deploy --skip-tests --no-version-check'''
+'''python robot/robot.py deploy --skip-tests'''
+'''py robot/robot.py deploy --skip-tests --no-version-check'''
 
 # if ctre not found
 '''py -3 -m pip install -U robotpy[ctre]'''
@@ -28,7 +30,7 @@ from components.boom import Boom
 
 INPUT_SENSITIVITY = .3
 
-MagicRobot.control_loop_wait_time = 0.2
+MagicRobot.control_loop_wait_time = 0.05
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
@@ -37,6 +39,9 @@ class SpartaBot(MagicRobot):
 
     def createObjects(self):
         '''Create motors and stuff here'''
+
+        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
+        
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
@@ -48,6 +53,11 @@ class SpartaBot(MagicRobot):
 
         self.talon_R_1 = WPI_TalonSRX(1)
         self.talon_R_2 = WPI_TalonSRX(5)
+
+        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid.set(DoubleSolenoid.Value.kForward)
+
 
         self.boom_extender_spark = wpilib.Spark(0) # TODO get actual spark controller
         self.boom_rotator_spark = wpilib.Spark(1) 
@@ -77,7 +87,6 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
-
         # boom controls
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
@@ -100,6 +109,13 @@ class SpartaBot(MagicRobot):
         
 
         # self.drivetrain's execute() method is automatically called
+
+        if self.drive_controller.getBButtonReleased():
+            Grabber.turn_off_compressor(self)
+        
+        if self.drive_controller.getAButtonReleased():
+            Grabber.solenoid_toggle(self)
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
