@@ -59,8 +59,8 @@ class SpartaBot(MagicRobot):
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
 
-        self.boom_extender_spark = wpilib.Spark(0) # TODO get actual spark controller
-        self.boom_rotator_spark = wpilib.Spark(1) 
+        self.boom_extender_spark = wpilib.Spark(4) # TODO get actual spark controller
+        self.boom_rotator_spark = wpilib.Spark(2) 
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
