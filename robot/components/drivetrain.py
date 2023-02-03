@@ -7,7 +7,7 @@ from utils import limit
 
 
 SPEED_MULTIPLIER = 1
-ANGLE_MULTIPLIER = 0.7
+ANGLE_MULTIPLIER = 1
 
 
 class DriveTrain:
@@ -53,7 +53,8 @@ class DriveTrain:
 
         # print(speed, angle)
         
-        # self.drive.arcadeDrive(-angle * ANGLE_MULTIPLIER, -speed * SPEED_MULTIPLIER, True) NOTE: THIS IS INVERSED?
-        self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
+        self.drive.arcadeDrive(angle * ANGLE_MULTIPLIER, speed * SPEED_MULTIPLIER, True)
+        #NOTE: THIS IS INVERSED?
+        #self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
 
         

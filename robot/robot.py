@@ -1,8 +1,9 @@
 import wpilib
+import rev
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
-from wpilib import Solenoid, DoubleSolenoid
+from wpilib import DoubleSolenoid
 from components.drivetrain import DriveTrain
 
 import time
@@ -41,26 +42,27 @@ class SpartaBot(MagicRobot):
         '''Create motors and stuff here'''
 
         PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
-        
+        MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
         self.drive_controller = wpilib.XboxController(0) #0 works for sim?
 
-        self.talon_L_1 = WPI_TalonSRX(6)
-        self.talon_L_2 = WPI_TalonSRX(9)
+        self.talon_L_1 = WPI_TalonSRX(1)
+        self.talon_L_2 = WPI_TalonSRX(5)
 
-        self.talon_R_1 = WPI_TalonSRX(1)
-        self.talon_R_2 = WPI_TalonSRX(5)
+        self.talon_R_1 = WPI_TalonSRX(6)
+        self.talon_R_2 = WPI_TalonSRX(9)
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
 
-        self.boom_extender_spark = wpilib.Spark(4) # TODO get actual spark controller
-        self.boom_rotator_spark = wpilib.Spark(2) 
+        self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
+        self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        #self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -79,7 +81,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, -angle)
+            self.drivetrain.set_motors(speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -92,21 +94,42 @@ class SpartaBot(MagicRobot):
         #   else, they control angle
 
         if (self.drive_controller.getLeftBumper()):
-            extend_speed = 0
+            #extend_speed = 0
 
             # left trigger retracts, while right trigger extends
-            extend_speed -= self.drive_controller.getLeftTriggerAxis()
-            extend_speed += self.drive_controller.getRightTriggerAxis()
+            self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
+            self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
 
-            self.boom_arm.set_extender(extend_speed)
+            #self.boom_arm.set_extender(extend_speed)
+            
+        elif self.drive_controller.getRightTriggerAxis() > 0.05:
+            #rotation_speed = 0
+
+            
+            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
+
+
+            #self.boom_arm.set_rotator(rotation_speed)
+            #self.boom_rotator_spark.set(rotation_speed/4)
+        elif self.drive_controller.getLeftTriggerAxis() > 0.05:
+            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
+
         else:
-            rotation_speed = 0
-
-            rotation_speed -= self.drive_controller.getLeftTriggerAxis()
-            rotation_speed += self.drive_controller.getRightTriggerAxis()
-
-            self.boom_arm.set_rotator(rotation_speed)
+            self.boom_arm.rotator_speed = 0
+            self.boom_arm.extender_speed = 0
+            
         
+        if self.drive_controller.getXButton():
+            #self.testmotor.set(0.5)
+            self.boom_arm.rotator_speed = 0.5
+            print(self.boom_arm.rotator_speed)
+
+        else:
+            #self.testmotor.set(0)
+            self.boom_rotator_spark.set(0)
+
+        
+
 
         # self.drivetrain's execute() method is automatically called
 
