@@ -8,7 +8,7 @@ from components.drivetrain import DriveTrain
 
 import time
 from components.boom import Boom
-from components.Grabber import Grabber
+from components.grabber import grabber
 
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
@@ -134,10 +134,10 @@ class SpartaBot(MagicRobot):
         # self.drivetrain's execute() method is automatically called
 
         if self.drive_controller.getBButtonReleased():
-            Grabber.turn_off_compressor(self)
+            grabber.turn_off_compressor(self)
         
         if self.drive_controller.getAButtonReleased():
-            Grabber.solenoid_toggle(self)
+            grabber.solenoid_toggle(self)
 
 
 if __name__ == '__main__':
