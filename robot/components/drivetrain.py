@@ -3,20 +3,11 @@ from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 from ctre import WPI_TalonSRX
 
+from utils import limit
+
 
 SPEED_MULTIPLIER = 1
-ANGLE_MULTIPLIER = 0.7
-
-def limit(number: float, limits: list) -> float:
-    """
-    return a number within the limits, returning the limiting number if out of bounds
-    number: any number
-    limits: list of limits, first element is minimum, second is max
-    ex:
-        >>> limit(5, [-4, 4])
-        >>> 4
-    """
-    return min(max(number, limits[0]), limits[1])
+ANGLE_MULTIPLIER = 1
 
 
 class DriveTrain:
@@ -62,7 +53,8 @@ class DriveTrain:
 
         # print(speed, angle)
         
-        # self.drive.arcadeDrive(-angle * ANGLE_MULTIPLIER, -speed * SPEED_MULTIPLIER, True) NOTE: THIS IS INVERSED?
-        self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
+        self.drive.arcadeDrive(angle * ANGLE_MULTIPLIER, speed * SPEED_MULTIPLIER, True)
+        #NOTE: THIS IS INVERSED?
+        #self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
 
         
