@@ -37,6 +37,8 @@ py -3 -m pip install robotpy[ctre]
 INPUT_SENSITIVITY = 0.05
 
 MagicRobot.control_loop_wait_time = 0.05
+
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
@@ -52,7 +54,7 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller = wpilib.XboxController(0) #0 works for sim?
+        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonSRX(1)
         self.talon_L_2 = WPI_TalonSRX(5)
@@ -64,10 +66,9 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-
         self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
         self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
-        #self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
+        # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -102,15 +103,13 @@ class SpartaBot(MagicRobot):
 
             self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
 
-        
-        elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() >INPUT_SENSITIVITY:
+        elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
 
             self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
 
         elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
 
             self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
-
 
         elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
 
@@ -120,12 +119,11 @@ class SpartaBot(MagicRobot):
             self.boom_arm.rotator_speed = 0
             self.boom_arm.extender_speed = 0
 
-
         # self.drivetrain's execute() method is automatically called
 
         if self.drive_controller.getBButtonReleased():
             grabber.turn_off_compressor(self)
-        
+
         if self.drive_controller.getAButtonReleased():
             grabber.solenoid_toggle(self)
 

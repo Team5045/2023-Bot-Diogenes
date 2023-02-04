@@ -8,4 +8,3 @@ def limit(number: float, limits: list) -> float:
         >>> 4
     """
     return min(max(number, limits[0]), limits[1])
-    
