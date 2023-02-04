@@ -11,25 +11,30 @@ from components.boom import Boom
 from components.grabber import grabber
 
 # Download and install stuff on the RoboRIO after imaging
-'''py -3 -m robotpy_installer download-python
-   py -3 -m robotpy_installer install-python
-   py -3 -m robotpy_installer download robotpy
-   py -3 -m robotpy_installer install robotpy
-   py -3 -m robotpy_installer download robotpy[ctre]
-   py -3 -m robotpy_installer install robotpy[ctre]
-   py -3 -m robotpy_installer download robotpy[rev]
-   py -3 -m robotpy_installer install robotpy[rev]
+'''
+py -3 -m robotpy_installer download-python
+py -3 -m robotpy_installer install-python
+py -3 -m robotpy_installer download robotpy
+py -3 -m robotpy_installer install robotpy
+py -3 -m robotpy_installer download robotpy[ctre]
+py -3 -m robotpy_installer install robotpy[ctre]
+py -3 -m robotpy_installer download robotpy[rev]
+py -3 -m robotpy_installer install robotpy[rev]
 '''
 
 # Push code to RoboRIO (only after imaging)
-'''python robot/robot.py deploy --skip-tests'''
-'''py robot/robot.py deploy --skip-tests --no-version-check'''
+'''
+python robot/robot.py deploy --skip-tests
+py robot/robot.py deploy --skip-tests --no-version-check
+'''
 
 # if ctre not found
-'''py -3 -m pip install -U robotpy[ctre]'''
-'''py -3 -m pip install robotpy[ctre]'''
+'''
+py -3 -m pip install -U robotpy[ctre]
+py -3 -m pip install robotpy[ctre]
+'''
 
-INPUT_SENSITIVITY = .3
+INPUT_SENSITIVITY = 0.05
 
 MagicRobot.control_loop_wait_time = 0.05
 class SpartaBot(MagicRobot):
@@ -93,42 +98,27 @@ class SpartaBot(MagicRobot):
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
 
-        if (self.drive_controller.getLeftBumper()):
-            #extend_speed = 0
+        if self.drive_controller.getLeftBumper() and self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
 
-            # left trigger retracts, while right trigger extends
-            self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
-            self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
+            self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
 
-            #self.boom_arm.set_extender(extend_speed)
-            
-        elif self.drive_controller.getRightTriggerAxis() > 0.05:
-            #rotation_speed = 0
+        
+        elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() >INPUT_SENSITIVITY:
 
-            
-            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
+            self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
+
+        elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+
+            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
 
 
-            #self.boom_arm.set_rotator(rotation_speed)
-            #self.boom_rotator_spark.set(rotation_speed/4)
-        elif self.drive_controller.getLeftTriggerAxis() > 0.05:
-            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
+        elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
+
+            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()
 
         else:
             self.boom_arm.rotator_speed = 0
             self.boom_arm.extender_speed = 0
-            
-        
-        if self.drive_controller.getXButton():
-            #self.testmotor.set(0.5)
-            self.boom_arm.rotator_speed = 0.5
-            print(self.boom_arm.rotator_speed)
-
-        else:
-            #self.testmotor.set(0)
-            self.boom_rotator_spark.set(0)
-
-        
 
 
         # self.drivetrain's execute() method is automatically called
