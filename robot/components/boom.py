@@ -1,6 +1,6 @@
 from wpilib import Spark
 from networktables import NetworkTable
-
+import rev
 from utils import limit
 
 
@@ -8,8 +8,8 @@ STRING_LEN = 28.5 # (inches)
 class Boom:
 
     # get sparks from main robot via variable injection
-    boom_extender_spark: Spark
-    boom_rotator_spark: Spark
+    boom_extender_spark: rev.CANSparkMax
+    boom_rotator_spark: rev.CANSparkMax
 
     sd: NetworkTable
 

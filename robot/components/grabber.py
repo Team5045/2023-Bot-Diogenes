@@ -3,7 +3,7 @@ from wpilib import DoubleSolenoid
 from magicbot import MagicRobot
 
 
-class Grabber:
+class grabber:
 
     def setup(self):
 
