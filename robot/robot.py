@@ -139,6 +139,10 @@ class SpartaBot(MagicRobot):
         if self.drive_controller.getAButtonReleased():
             grabber.solenoid_toggle(self)
 
+        if self.drive_controller.getYButton():
+
+
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
