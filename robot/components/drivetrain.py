@@ -25,10 +25,13 @@ class DriveTrain:
     def setup(self):
         """instead of __init__(), use setup() to initialize values (works with magicirobot variable injection"""
 
-        self.left_motors: MotorControllerGroup = MotorControllerGroup(self.talon_L_1, self.talon_L_2)
-        self.right_motors: MotorControllerGroup = MotorControllerGroup(self.talon_R_1, self.talon_R_2)
+        self.left_motors: MotorControllerGroup = MotorControllerGroup(
+            self.talon_L_1, self.talon_L_2)
+        self.right_motors: MotorControllerGroup = MotorControllerGroup(
+            self.talon_R_1, self.talon_R_2)
 
-        self.drive: DifferentialDrive = DifferentialDrive(self.left_motors, self.right_motors)
+        self.drive: DifferentialDrive = DifferentialDrive(
+            self.left_motors, self.right_motors)
 
     # control method
     def set_motors(self, speed: float, angle: float):
@@ -47,14 +50,13 @@ class DriveTrain:
         Reads the data from smartdashboard (set by control methods), and then sends data to output devices such as motors.
         Execute is called in telopPeriodic automatically; no need to manually call
         """
-        
+
         speed = self.sd.getValue("Speed", defaultValue=0.0)
         angle = self.sd.getValue("Angle", defaultValue=0.0)
 
         # print(speed, angle)
-        
-        self.drive.arcadeDrive(angle * ANGLE_MULTIPLIER, speed * SPEED_MULTIPLIER, True)
-        #NOTE: THIS IS INVERSED?
-        #self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
 
-        
+        self.drive.arcadeDrive(angle * ANGLE_MULTIPLIER,
+                               speed * SPEED_MULTIPLIER, True)
+        # NOTE: THIS IS INVERSED?
+        # self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
