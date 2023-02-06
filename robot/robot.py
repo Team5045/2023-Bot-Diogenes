@@ -7,7 +7,7 @@ from wpilib import DoubleSolenoid
 from components.drivetrain import DriveTrain
 
 from components.boom import Boom
-from components.grabber import grabber
+from components.grabber import Grabber
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -133,10 +133,10 @@ class SpartaBot(MagicRobot):
         # self.drivetrain's execute() method is automatically called
 
         if self.drive_controller.getBButtonReleased():
-            grabber.turn_off_compressor(self)
+            Grabber.turn_off_compressor(self)
 
         if self.drive_controller.getAButtonReleased():
-            grabber.solenoid_toggle(self)
+            Grabber.solenoid_toggle(self)
 
 
 if __name__ == '__main__':
