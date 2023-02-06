@@ -6,7 +6,6 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 from components.drivetrain import DriveTrain
 
-import time
 from components.boom import Boom
 from components.grabber import grabber
 
@@ -101,26 +100,35 @@ class SpartaBot(MagicRobot):
         # boom controls
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
+        speed = 0
 
-        if self.drive_controller.getLeftBumper() and self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+        speed += self.drive_controller.getRightTriggerAxis()
+        speed -= self.drive_controller.getLeftTriggerAxis()
 
-            self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
+        self.boom_arm.set_extender(0)
+        self.boom_arm.set_rotator(0)
 
-        elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
+        if (speed > INPUT_SENSITIVITY):
+            if self.drive_controller.getLeftBumper():
+                self.boom_arm.set_extender(speed/10) # divide by 10 to slow down extendor (prevent overwinding)
+            else:
+                self.boom_arm.set_rotator(speed)
 
-            self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
+        # if self.drive_controller.getLeftBumper() and self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+        #     self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
 
-        elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+        # elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
+        #     self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
 
-            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
+        # elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+        #     self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
 
-        elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
+        # elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
+        #     self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()
 
-            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()
-
-        else:
-            self.boom_arm.rotator_speed = 0
-            self.boom_arm.extender_speed = 0
+        # else:
+        #     self.boom_arm.rotator_speed = 0
+        #     self.boom_arm.extender_speed = 0
 
         # self.drivetrain's execute() method is automatically called
 
