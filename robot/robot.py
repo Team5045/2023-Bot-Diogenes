@@ -65,8 +65,8 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
         # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
@@ -104,31 +104,16 @@ class SpartaBot(MagicRobot):
 
         speed += self.drive_controller.getRightTriggerAxis()
         speed -= self.drive_controller.getLeftTriggerAxis()
-
+        
         self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)
 
-        if (speed > INPUT_SENSITIVITY):
+        if (abs(speed) > INPUT_SENSITIVITY):
             if self.drive_controller.getLeftBumper():
                 self.boom_arm.set_extender(speed/10) # divide by 10 to slow down extendor (prevent overwinding)
             else:
                 self.boom_arm.set_rotator(speed)
-
-        # if self.drive_controller.getLeftBumper() and self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
-        #     self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
-
-        # elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
-        #     self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
-
-        # elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
-        #     self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
-
-        # elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
-        #     self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()
-
-        # else:
-        #     self.boom_arm.rotator_speed = 0
-        #     self.boom_arm.extender_speed = 0
+        self.drive_controller.getLeftBumper()
 
         # self.drivetrain's execute() method is automatically called
 
