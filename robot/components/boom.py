@@ -1,4 +1,3 @@
-from wpilib import Spark
 from networktables import NetworkTable
 import rev
 from utils import limit
