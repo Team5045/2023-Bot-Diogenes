@@ -8,17 +8,18 @@ from components.drivetrain import DriveTrain
 
 from magicbot import AutonomousStateMachine, tunable, state, timed_state
 import wpilib
-import rev
-from ctre import WPI_TalonSRX
-from magicbot import MagicRobot
-from networktables import NetworkTables, NetworkTable
-from wpilib import DoubleSolenoid
-import wpilib.drive
-import networktables
+# import rev
+# from ctre import WPI_TalonSRX
+# from magicbot import MagicRobot
+# from networktables import NetworkTables, NetworkTable
+# from wpilib import DoubleSolenoid
+# import wpilib.drive
+# import networktables
 
-class score(AutonomousStateMachine):
-    MODE_NAME = "score"
-    DEFAULT = True
-    sd: networktables.NetworkTable
+# class score(AutonomousStateMachine):
+#     MODE_NAME = "score"
+#     DEFAULT = True
+#     sd: networktables.NetworkTable
+
     
     

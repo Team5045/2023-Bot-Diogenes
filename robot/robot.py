@@ -175,6 +175,7 @@ class SpartaBot(MagicRobot):
         if self.drive_controller.getYButtonReleased():
             self.drive.arcadeDrive(0, 0, True)
         
+        '''when the y button is pressed/released, Limelight's functions are called'''
         
 
         # if self.drive_controller.getBButtonReleased():
