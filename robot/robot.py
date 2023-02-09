@@ -104,7 +104,7 @@ class SpartaBot(MagicRobot):
 
         speed += self.drive_controller.getRightTriggerAxis()
         speed -= self.drive_controller.getLeftTriggerAxis()
-        
+
         self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)
 
@@ -113,7 +113,6 @@ class SpartaBot(MagicRobot):
                 self.boom_arm.set_extender(speed/10) # divide by 10 to slow down extendor (prevent overwinding)
             else:
                 self.boom_arm.set_rotator(speed)
-        self.drive_controller.getLeftBumper()
 
         # self.drivetrain's execute() method is automatically called
 
