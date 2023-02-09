@@ -7,25 +7,30 @@ from magicbot import AutonomousStateMachine, tunable, timed_state
 from networktables import NetworkTables, NetworkTable
 import wpilib
 import wpilib.drive
+import networktables
 
 class autoDrive(AutonomousStateMachine):
 
     # Using the built in variable injection from magicbot
     MODE_NAME = "autodrive"
     DEFAULT = True
+    sd: networktables.NetworkTable
 
     @timed_state(duration=2, next_state="ChargePad")
     def goFoward(self):
         self.drive.arcadeDrive(0.5, 0, True)
+        self.sd.putValue("Mode:", "Moving Forward")
     # First autonomous state, makes robot drive forward to get ready to score
     
     @timed_state(duartion=3, next_state="done")
     def ChargePad(self):
         self.drive.arcadeDrive(-0.5, 0, True)
+        self.sd.putValue("Mode", "Moving Back")
     # Second autonomous state, makes robot drive backward, HOPEFULLY, to get to the charge station
-    @timed_state(duration=10)
+    @timed_state
     def done(self):
         self.drive.arcadeDrive(0, 0, True)
+        self.sd.putValue("Mode", "Autonomous Done")
     # Robot stops now that driving is finished, should then switch to teleop because magicbot
 
 

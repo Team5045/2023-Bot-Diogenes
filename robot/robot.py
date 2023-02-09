@@ -12,6 +12,8 @@ from robotpy_ext.autonomous import AutonomousModeSelector
 import time
 from components.boom import Boom
 from components.grabber import grabber
+from components.LimeLight import aiming
+from components.drivetrain import DriveTrain
 
 from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
@@ -171,10 +173,13 @@ class SpartaBot(MagicRobot):
             #self.testmotor.set(0)
             self.boom_rotator_spark.set(0)
         
-        
-
-
         '''self.drivetrain's execute() method is automatically called'''
+        
+        if self.drive_controller.getYButtonPressed():
+            aiming.side_to_side(self)
+            aiming.forward_backward(self)
+        if self.drive_controller.getYButtonReleased():
+            self.drive.arcadeDrive(0, 0, True)
 
         # if self.drive_controller.getBButtonReleased():
         #     grabber.turn_off_compressor(self)
