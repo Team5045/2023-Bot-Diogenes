@@ -4,7 +4,9 @@ import rev
 from utils import limit
 
 
-STRING_LEN = 28.5 # (inches)
+STRING_LEN = 28.5  # (inches)
+
+
 class Boom:
 
     # get sparks from main robot via variable injection

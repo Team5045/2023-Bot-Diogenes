@@ -20,25 +20,30 @@ from networktables import NetworkTable
 from ctre import WPI_TalonSRX
 
 # Download and install stuff on the RoboRIO after imaging
-'''py -3 -m robotpy_installer download-python
-   py -3 -m robotpy_installer install-python
-   py -3 -m robotpy_installer download robotpy
-   py -3 -m robotpy_installer install robotpy
-   py -3 -m robotpy_installer download robotpy[ctre]
-   py -3 -m robotpy_installer install robotpy[ctre]
-   py -3 -m robotpy_installer download robotpy[rev]
-   py -3 -m robotpy_installer install robotpy[rev]
+'''
+py -3 -m robotpy_installer download-python
+py -3 -m robotpy_installer install-python
+py -3 -m robotpy_installer download robotpy
+py -3 -m robotpy_installer install robotpy
+py -3 -m robotpy_installer download robotpy[ctre]
+py -3 -m robotpy_installer install robotpy[ctre]
+py -3 -m robotpy_installer download robotpy[rev]
+py -3 -m robotpy_installer install robotpy[rev]
 '''
 
 # Push code to RoboRIO (only after imaging)
-'''python robot/robot.py deploy --skip-tests'''
-'''py robot/robot.py deploy --skip-tests --no-version-check'''
+'''
+python robot/robot.py deploy --skip-tests
+py robot/robot.py deploy --skip-tests --no-version-check
+'''
 
 # if ctre not found
-'''py -3 -m pip install -U robotpy[ctre]'''
-'''py -3 -m pip install robotpy[ctre]'''
+'''
+py -3 -m pip install -U robotpy[ctre]
+py -3 -m pip install robotpy[ctre]
+'''
 
-INPUT_SENSITIVITY = .3
+INPUT_SENSITIVITY = 0.05
 
 MagicRobot.control_loop_wait_time = 0.05
 
@@ -60,10 +65,7 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.timer = wpilib.Timer()
-        self.autonmodes = AutonomousModeSelector("autonomous")
-
-        self.drive_controller = wpilib.XboxController(0) #0 works for sim?
+        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonSRX(1)
         self.talon_L_2 = WPI_TalonSRX(5)
@@ -75,10 +77,9 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-
         self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
         self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
-        #self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
+        # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
