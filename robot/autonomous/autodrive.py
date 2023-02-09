@@ -3,19 +3,18 @@
 from components.drivetrain import DriveTrain
 # imported drivetrain from components folder
 
-from magicbot import AutonomousStateMachine, tunable, timed_state
+from magicbot import AutonomousStateMachine, tunable, state, timed_state
 from networktables import NetworkTables, NetworkTable
 import wpilib
 import wpilib.drive
 import networktables
 
+MODE_NAME = "autodrive"
+DEFAULT = True
+sd: networktables.NetworkTable
+# Using the built in variable injection from magicbot
+
 class autoDrive(AutonomousStateMachine):
-
-    # Using the built in variable injection from magicbot
-    MODE_NAME = "autodrive"
-    DEFAULT = True
-    sd: networktables.NetworkTable
-
     @timed_state(duration=2, next_state="ChargePad")
     def goFoward(self):
         self.drive.arcadeDrive(0.5, 0, True)
@@ -27,7 +26,7 @@ class autoDrive(AutonomousStateMachine):
         self.drive.arcadeDrive(-0.5, 0, True)
         self.sd.putValue("Mode", "Moving Back")
     # Second autonomous state, makes robot drive backward, HOPEFULLY, to get to the charge station
-    @timed_state
+    @state
     def done(self):
         self.drive.arcadeDrive(0, 0, True)
         self.sd.putValue("Mode", "Autonomous Done")

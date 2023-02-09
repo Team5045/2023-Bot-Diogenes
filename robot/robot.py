@@ -7,9 +7,8 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
-
-
 import time
+
 from components.boom import Boom
 from components.grabber import grabber
 from components.LimeLight import aiming
@@ -19,12 +18,7 @@ from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 from ctre import WPI_TalonSRX
-# -------------------------------- Commented Out Imports, to be un-commented ---------------------
-# from robot.utils import limit
-# from components.drivetrain import DriveTrain
-# from components.boom import Boom
-# from components.grabber import grabber
-# ------------------------------------------------------------------------------------------------
+
 # Download and install stuff on the RoboRIO after imaging
 '''py -3 -m robotpy_installer download-python
    py -3 -m robotpy_installer install-python
@@ -180,6 +174,8 @@ class SpartaBot(MagicRobot):
             aiming.forward_backward(self)
         if self.drive_controller.getYButtonReleased():
             self.drive.arcadeDrive(0, 0, True)
+        
+        
 
         # if self.drive_controller.getBButtonReleased():
         #     grabber.turn_off_compressor(self)

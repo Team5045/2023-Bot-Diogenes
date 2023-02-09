@@ -1,3 +1,9 @@
+# To-do List for Limelight--------------------------------------------------------------------
+# Factor in April Tags? (Limelight 3.0 required)\
+# Install the limelight on the robot for testing
+# Figure out how to manage the limelight LED stat frrom controller
+# --------------------------------------------------------------------------------------------
+
 import networktables
 import wpilib.drive
 import wpilib
