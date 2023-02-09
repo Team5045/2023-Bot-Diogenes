@@ -8,6 +8,7 @@ import networktables
 import wpilib.drive
 import wpilib
 from networktables import NetworkTables
+from components.drivetrain import DriveTrain
 
 LED_ON = 1
 LED_OFF = 0
@@ -17,6 +18,7 @@ LED_PartialLeft = 3
 
 class aiming:
     table = NetworkTables.getTable("Limelight")
+    drivetrain: DriveTrain
     # Pulls values for limelight
     tx = table.getNumber('tx', None)
     ty = table.getNumber('ty', None)
@@ -37,9 +39,9 @@ class aiming:
             self.move = self.limelight.getNumber('ta', None)
             print(self.move)
             if self.move < 10:
-                self.drive.arcadeDrive(0.5, 0, True)
+                self.drivetrain.set_motors(0.5, 0.0)
             elif self.move > 10:
-                self.drivearcadeDrive(-0,5, 0, True)
+                self.drivetrain.set_motors(-0,5, 0)
         except Exception as e:
             print(e + "Did not work (Type 2)")
 

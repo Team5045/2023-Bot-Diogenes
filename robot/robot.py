@@ -73,12 +73,12 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonSRX(6)
         self.talon_R_2 = WPI_TalonSRX(9)
 
-        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        # self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        # self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        # self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        # self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
+        # self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
         # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
@@ -133,48 +133,48 @@ class SpartaBot(MagicRobot):
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
 
-        if (self.drive_controller.getLeftBumper()):
-            #extend_speed = 0
+        # if (self.drive_controller.getLeftBumper()):
+        #     #extend_speed = 0
         
-            # left trigger retracts, while right trigger extends
-            self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
-            self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
+        #     # left trigger retracts, while right trigger extends
+        #     self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
+        #     self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
         
-            #self.boom_arm.set_extender(extend_speed)
+        #     #self.boom_arm.set_extender(extend_speed)
         
-        elif self.drive_controller.getRightTriggerAxis() > 0.05:
-            #rotation_speed = 0
-        
-        
-            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
+        # elif self.drive_controller.getRightTriggerAxis() > 0.05:
+        #     #rotation_speed = 0
         
         
-            #self.boom_arm.set_rotator(rotation_speed)
-            #self.boom_rotator_spark.set(rotation_speed/4)
-        elif self.drive_controller.getLeftTriggerAxis() > 0.05:
-            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
-        
-        else:
-            self.boom_arm.rotator_speed = 0
-            self.boom_arm.extender_speed = 0
+        #     self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
         
         
-        if self.drive_controller.getXButton():
-            #self.testmotor.set(0.5)
-            self.boom_arm.rotator_speed = 0.5
-            print(self.boom_arm.rotator_speed)
+        #     #self.boom_arm.set_rotator(rotation_speed)
+        #     #self.boom_rotator_spark.set(rotation_speed/4)
+        # elif self.drive_controller.getLeftTriggerAxis() > 0.05:
+        #     self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
         
-        else:
-            #self.testmotor.set(0)
-            self.boom_rotator_spark.set(0)
+        # else:
+        #     self.boom_arm.rotator_speed = 0
+        #     self.boom_arm.extender_speed = 0
         
-        '''self.drivetrain's execute() method is automatically called'''
         
-        if self.drive_controller.getYButtonPressed():
-            aiming.side_to_side(self)
-            aiming.forward_backward(self)
-        if self.drive_controller.getYButtonReleased():
-            self.drive.arcadeDrive(0, 0, True)
+        # if self.drive_controller.getXButton():
+        #     #self.testmotor.set(0.5)
+        #     self.boom_arm.rotator_speed = 0.5
+        #     print(self.boom_arm.rotator_speed)
+        
+        # else:
+        #     #self.testmotor.set(0)
+        #     self.boom_rotator_spark.set(0)
+        
+        # '''self.drivetrain's execute() method is automatically called'''
+        
+        # if self.drive_controller.getYButtonPressed():
+        #     aiming.side_to_side(self)
+        #     aiming.forward_backward(self)
+        # if self.drive_controller.getYButtonReleased():
+        #     self.drive.arcadeDrive(0, 0, True)
         
         '''when the y button is pressed/released, Limelight's functions are called'''
         
