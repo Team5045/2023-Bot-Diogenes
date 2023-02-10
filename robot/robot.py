@@ -1,7 +1,7 @@
 import timer
 import wpilib
 import rev
-from ctre import WPI_TalonSRX
+from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
@@ -27,6 +27,10 @@ py -3 -m robotpy_installer download robotpy[ctre]
 py -3 -m robotpy_installer install robotpy[ctre]
 py -3 -m robotpy_installer download robotpy[rev]
 py -3 -m robotpy_installer install robotpy[rev]
+py -3 -m robotpy_installer download pynetworktables
+py -3 -m robotpy_installer install pynetworktables
+py -3 -m pip install -U robotpy[ctre]
+py -3 -m pip install robotpy[ctre]
 '''
 
 # Push code to RoboRIO (only after imaging)
@@ -35,11 +39,6 @@ python robot/robot.py deploy --skip-tests
 py robot/robot.py deploy --skip-tests --no-version-check
 '''
 
-# if ctre not found
-'''
-py -3 -m pip install -U robotpy[ctre]
-py -3 -m pip install robotpy[ctre]
-'''
 
 INPUT_SENSITIVITY = 0.05
 
@@ -66,11 +65,11 @@ class SpartaBot(MagicRobot):
 
         self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
-        self.talon_L_1 = WPI_TalonSRX(1)
-        self.talon_L_2 = WPI_TalonSRX(5)
+        self.talon_L_1 = WPI_TalonFX(4)
+        self.talon_L_2 = WPI_TalonFX(8)
 
-        self.talon_R_1 = WPI_TalonSRX(6)
-        self.talon_R_2 = WPI_TalonSRX(9)
+        self.talon_R_1 = WPI_TalonFX(7)
+        self.talon_R_2 = WPI_TalonFX(6)
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
@@ -101,7 +100,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # inverse values to get inverse controls
-            self.drivetrain.set_motors(speed, -angle)
+            self.drivetrain.set_motors(-speed, angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -116,6 +115,7 @@ class SpartaBot(MagicRobot):
 
         speed += self.drive_controller.getRightTriggerAxis()
         speed -= self.drive_controller.getLeftTriggerAxis()
+
 
         self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)

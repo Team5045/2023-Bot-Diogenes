@@ -1,8 +1,9 @@
 from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
-from ctre import WPI_TalonSRX
-import utils
+
+from ctre import WPI_TalonFX
+
 from utils import limit
 
 
@@ -14,11 +15,11 @@ class DriveTrain:
 
     # Magicrobot variable injection automatically gets these values from main robot
     # NOTE: components must go in the components folder for magicrobot to properly inject shared variables
-    talon_L_1: WPI_TalonSRX
-    talon_L_2: WPI_TalonSRX
+    talon_L_1: WPI_TalonFX
+    talon_L_2: WPI_TalonFX
 
-    talon_R_1: WPI_TalonSRX
-    talon_R_2: WPI_TalonSRX
+    talon_R_1: WPI_TalonFX
+    talon_R_2: WPI_TalonFX
 
     sd: NetworkTable
 
