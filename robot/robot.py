@@ -6,9 +6,8 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 from components.drivetrain import DriveTrain
 
-import time
 from components.boom import Boom
-from components.grabber import grabber
+from components.grabber import Grabber
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -36,6 +35,9 @@ py -3 -m pip install robotpy[ctre]
 
 INPUT_SENSITIVITY = 0.05
 
+PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
+MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
+
 MagicRobot.control_loop_wait_time = 0.05
 
 
@@ -47,9 +49,6 @@ class SpartaBot(MagicRobot):
 
     def createObjects(self):
         '''Create motors and stuff here'''
-
-        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
-        MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
@@ -66,8 +65,8 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
+        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
         # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
 
     def disabledPeriodic(self):
@@ -78,7 +77,10 @@ class SpartaBot(MagicRobot):
         self.sd.putValue("Mode", "Teleop")
 
     def teleopPeriodic(self):
-        '''Called on each iteration of the control loop'''
+        '''
+        Called on each iteration of the control loop\n
+        NOTE: all components' execute() methods will be called automatically
+        '''
 
         # drive controls
 
@@ -98,34 +100,27 @@ class SpartaBot(MagicRobot):
         # boom controls
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
+        speed = 0
 
-        if self.drive_controller.getLeftBumper() and self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
+        speed += self.drive_controller.getRightTriggerAxis()
+        speed -= self.drive_controller.getLeftTriggerAxis()
 
-            self.boom_arm.extender_speed = self.drive_controller.getRightTriggerAxis()/10
+        self.boom_arm.set_extender(0)
+        self.boom_arm.set_rotator(0)
 
-        elif self.drive_controller.getLeftBumper() and self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
-
-            self.boom_arm.extender_speed = -self.drive_controller.getLeftTriggerAxis()
-
-        elif self.drive_controller.getRightTriggerAxis() > INPUT_SENSITIVITY:
-
-            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()
-
-        elif self.drive_controller.getLeftTriggerAxis() > INPUT_SENSITIVITY:
-
-            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()
-
-        else:
-            self.boom_arm.rotator_speed = 0
-            self.boom_arm.extender_speed = 0
+        if (abs(speed) > INPUT_SENSITIVITY):
+            if self.drive_controller.getLeftBumper():
+                self.boom_arm.set_extender(speed/10) # divide by 10 to slow down extendor (prevent overwinding)
+            else:
+                self.boom_arm.set_rotator(speed)
 
         # self.drivetrain's execute() method is automatically called
 
         if self.drive_controller.getBButtonReleased():
-            grabber.turn_off_compressor(self)
+            Grabber.turn_off_compressor(self)
 
         if self.drive_controller.getAButtonReleased():
-            grabber.solenoid_toggle(self)
+            Grabber.solenoid_toggle(self)
 
 
 if __name__ == '__main__':
