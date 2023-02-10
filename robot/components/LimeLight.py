@@ -16,6 +16,7 @@ LED_PartialRight = 2
 LED_PartialLeft = 3
 # Uh idk really how to turn on limelight in the code yet so ima just use the limelight finder tool to do that for now
 
+
 class aiming:
     table = NetworkTables.getTable("Limelight")
     drivetrain: DriveTrain
@@ -41,8 +42,6 @@ class aiming:
             if self.move < 10:
                 self.drivetrain.set_motors(0.5, 0.0)
             elif self.move > 10:
-                self.drivetrain.set_motors(-0,5, 0)
+                self.drivetrain.set_motors(-0, 5, 0)
         except Exception as e:
             print(e + "Did not work (Type 2)")
-
-

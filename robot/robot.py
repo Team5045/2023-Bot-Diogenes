@@ -1,4 +1,3 @@
-import timer
 import wpilib
 import rev
 from ctre import WPI_TalonFX
@@ -12,7 +11,6 @@ from components.boom import Boom
 from components.grabber import Grabber
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
-import time
 
 from components.LimeLight import aiming
 
@@ -50,10 +48,11 @@ MagicRobot.control_loop_wait_time = 0.05
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
-    
+
     drivetrain: DriveTrain
     boom_arm: Boom
 
@@ -78,10 +77,8 @@ class SpartaBot(MagicRobot):
         self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
         self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
 
-
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
-
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
@@ -116,13 +113,13 @@ class SpartaBot(MagicRobot):
         speed += self.drive_controller.getRightTriggerAxis()
         speed -= self.drive_controller.getLeftTriggerAxis()
 
-
         self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)
 
         if (abs(speed) > INPUT_SENSITIVITY):
             if self.drive_controller.getLeftBumper():
-                self.boom_arm.set_extender(speed/10) # divide by 10 to slow down extendor (prevent overwinding)
+                # divide by 10 to slow down extendor (prevent overwinding)
+                self.boom_arm.set_extender(speed/10)
             else:
                 self.boom_arm.set_rotator(speed)
 
@@ -135,8 +132,5 @@ class SpartaBot(MagicRobot):
             Grabber.solenoid_toggle(self)
 
 
-
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
-
-

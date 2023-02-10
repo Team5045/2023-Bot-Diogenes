@@ -57,6 +57,4 @@ class DriveTrain:
         Execute is called in telopPeriodic automatically; no need to manually call
         """
 
-
         self.drive.arcadeDrive(self.angle, self.speed, True)
-
