@@ -4,7 +4,6 @@ from components.drivetrain import DriveTrain
 # imported drivetrain from components folder
 
 from magicbot import AutonomousStateMachine, tunable, state, timed_state
-import wpilib.drive
 import networktables
 
 
