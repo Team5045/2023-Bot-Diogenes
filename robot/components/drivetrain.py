@@ -2,7 +2,7 @@ from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 from ctre import WPI_TalonSRX
-
+import utils
 from utils import limit
 
 
@@ -56,7 +56,6 @@ class DriveTrain:
         Execute is called in telopPeriodic automatically; no need to manually call
         """
 
-        self.drive.arcadeDrive(self.angle * ANGLE_MULTIPLIER,
-                               self.speed * SPEED_MULTIPLIER, True)
-        # NOTE: THIS IS INVERSED?
-        # self.drive.arcadeDrive(speed * SPEED_MULTIPLIER, angle * ANGLE_MULTIPLIER, squareInputs=True)
+
+        self.drive.arcadeDrive(self.angle, self.speed, True)
+

@@ -1,13 +1,21 @@
+import timer
 import wpilib
 import rev
 from ctre import WPI_TalonSRX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
+
 from components.drivetrain import DriveTrain
 
 from components.boom import Boom
 from components.grabber import Grabber
+import wpilib.drive
+from robotpy_ext.autonomous import AutonomousModeSelector
+import time
+
+from components.LimeLight import aiming
+
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -40,10 +48,13 @@ MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 
 MagicRobot.control_loop_wait_time = 0.05
 
+SPEED_MULTIPLIER = 1
+ANGLE_MULTIPLIER = 1
 
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
+    
     drivetrain: DriveTrain
     boom_arm: Boom
 
@@ -67,14 +78,15 @@ class SpartaBot(MagicRobot):
 
         self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
         self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
-        # self.testmotor = rev.CANSparkMax(3, MOTOR_BRUSHED)
+
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
+
     def teleopInit(self):
-        '''Called when teleop starts; optional'''
         self.sd.putValue("Mode", "Teleop")
+        '''Called when teleop starts; optional'''
 
     def teleopPeriodic(self):
         '''
@@ -83,7 +95,7 @@ class SpartaBot(MagicRobot):
         '''
 
         # drive controls
-
+        print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
@@ -123,5 +135,8 @@ class SpartaBot(MagicRobot):
             Grabber.solenoid_toggle(self)
 
 
+
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
+
+
