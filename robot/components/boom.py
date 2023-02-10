@@ -1,11 +1,9 @@
-from wpilib import Spark
 from networktables import NetworkTable
 import rev
 from utils import limit
 
 
 STRING_LEN = 28.5  # (inches)
-
 
 class Boom:
 
@@ -27,8 +25,12 @@ class Boom:
     def set_extender(self, motor_speed: float):
         self.extender_speed = limit(motor_speed, [-1, 1])
 
+        self.sd.putValue("Boom Extender Speed: ", self.extender_speed)
+
     def set_rotator(self, motor_speed: float):
         self.rotator_speed = limit(motor_speed, [-1, 1])
+
+        self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
 
     def execute(self):
 
