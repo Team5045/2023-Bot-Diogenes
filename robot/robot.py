@@ -11,7 +11,7 @@ import time
 
 from components.boom import Boom
 from components.grabber import grabber
-from components.LimeLight import aiming
+from components.limelight import aiming
 from components.drivetrain import DriveTrain
 
 from wpilib import MotorControllerGroup

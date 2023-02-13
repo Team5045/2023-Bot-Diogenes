@@ -2,8 +2,7 @@ from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 from ctre import WPI_TalonSRX
-import utils
-from utils import limit
+from utilities.lim import limit
 
 
 SPEED_MULTIPLIER = 1

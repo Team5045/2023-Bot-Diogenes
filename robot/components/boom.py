@@ -1,7 +1,7 @@
 from wpilib import Spark
 from networktables import NetworkTable
 import rev
-from utils import limit
+from utilities.lim import limit
 
 
 STRING_LEN = 28.5  # (inches)
