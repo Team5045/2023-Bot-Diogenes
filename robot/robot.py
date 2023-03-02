@@ -42,7 +42,7 @@ INPUT_SENSITIVITY = 0.05
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
-
+MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
 MagicRobot.control_loop_wait_time = 0.05
 
 SPEED_MULTIPLIER = 1
@@ -74,8 +74,8 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
+        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -118,10 +118,10 @@ class SpartaBot(MagicRobot):
 
         if (abs(speed) > INPUT_SENSITIVITY):
             if self.drive_controller.getLeftBumper():
-                # divide by 10 to slow down extendor (prevent overwinding)
-                self.boom_arm.set_extender(speed/10)
+                # limit is 0.15 of max speed (prevent overwinding)
+                self.boom_arm.set_extender(3*speed/20)
             else:
-                self.boom_arm.set_rotator(speed)
+                self.boom_arm.set_rotator(3*speed/20)
 
         # self.drivetrain's execute() method is automatically called
 
