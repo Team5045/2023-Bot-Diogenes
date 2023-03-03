@@ -10,6 +10,7 @@ import wpilib
 from networktables import NetworkTables
 from components.drivetrain import DriveTrain
 
+
 LED_ON = 1
 LED_OFF = 0
 LED_PartialRight = 2
@@ -18,20 +19,22 @@ LED_PartialLeft = 3
 
 
 class aiming:
-    table = NetworkTables.getTable("Limelight")
+    limelight = NetworkTables.getTable("limelight")
+    sd = NetworkTables.getTable('SmartDashboard')
     drivetrain: DriveTrain
     # Pulls values for limelight
-    tx = table.getNumber('tx', None)
-    ty = table.getNumber('ty', None)
-    ta = table.getNumber('ta', None)
-    ts = table.getNumber('ts', None)
+    tx = limelight.getNumber('tx', None)
+    ty = limelight.getNumber('ty', None)
+    ta = limelight.getNumber('ta', None)
+    ts = limelight.getNumber('ts', None)
     # Above values are just the value assignments that limeight reads, see limelight finder for specifics
+    sd: networktables.NetworkTable
 
     def side_to_side(self):
         try:
             self.turn = self.limelight.getNumber('tx', None) / 30.75
             print(self.turn)
-            self.drive.arcadeDrive(self.turn, 0)
+            self.sd.putValue(self.turn, 0)
         except Exception as e:
             print(e + "Did not work! (Type 1)")
 
@@ -40,8 +43,8 @@ class aiming:
             self.move = self.limelight.getNumber('ta', None)
             print(self.move)
             if self.move < 10:
-                self.drivetrain.set_motors(0.5, 0.0)
+                self.sd.putValue(0.5, 0.0)
             elif self.move > 10:
-                self.drivetrain.set_motors(-0, 5, 0)
+                self.sd.putValue(-0, 5, 0)
         except Exception as e:
             print(e + "Did not work (Type 2)")
