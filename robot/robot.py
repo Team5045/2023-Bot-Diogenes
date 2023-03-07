@@ -74,7 +74,7 @@ class SpartaBot(MagicRobot):
         self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHLESS)
+        self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
         self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
@@ -82,6 +82,9 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        # self.limelight = NetworkTables.getTable("limelight")
+        # self.limelight.LEDState(3)
+        # print("limelight on")
         '''Called when teleop starts; optional'''
 
     def teleopPeriodic(self):
@@ -91,7 +94,7 @@ class SpartaBot(MagicRobot):
         '''
 
         # drive controls
-        print("tele")
+        # print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
@@ -130,6 +133,13 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getAButtonReleased():
             Grabber.solenoid_toggle(self)
+        
+        if self.drive_controller.getYButton():
+            aiming.side_to_side(self)
+        
+        if self.drive_controller.getXButton():
+            aiming.forward_backward(self)
+        
 
 
 if __name__ == '__main__':
