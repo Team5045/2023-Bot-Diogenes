@@ -71,8 +71,10 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonFX(6)
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
+        self.solenoid1.set(DoubleSolenoid.Value.kForward)
+        self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
         self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
@@ -128,15 +130,15 @@ class SpartaBot(MagicRobot):
 
         # self.drivetrain's execute() method is automatically called
 
-        if self.drive_controller.getBButtonReleased():
+        if self.drive_controller.getLeftBumperReleased():
             Grabber.turn_off_compressor(self)
 
-        if self.drive_controller.getAButtonReleased():
+        if self.drive_controller.getRightBumperReleased():
             Grabber.solenoid_toggle(self)
         
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
-        
+            
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
         
