@@ -28,21 +28,26 @@ class aiming:
 
     def side_to_side(self):
         try:
-            self.turn = self.limelight.getNumber('tx', None) / 30.75
-            print(self.turn)
-            self.drive.arcadeDrive(self.turn, 0)
+            self.turn = self.table.getNumber('tx', None) / 30.75
+            print(f"turn {self.turn}")
+            # self.drive.arcadeDrive(self.turn, 0)
         except Exception as e:
             print(e + "Did not work! (Type 1)")
 
     def forward_backward(self):
         try:
-            self.move = self.limelight.getNumber('ta', None)
-            print(self.move)
+            self.move = self.table.getNumber('ta', None)
+            print(f"move {self.move}")
             if self.move < 10:
-                self.drivetrain.set_motors(0.5, 0.0)
+                # self.drivetrain.set_motors(0.5, 0.0)
+                pass
             elif self.move > 10:
-                self.drivetrain.set_motors(-0,5, 0)
+                # self.drivetrain.set_motors(-0,5, 0)
+                pass
         except Exception as e:
             print(e + "Did not work (Type 2)")
+
+
+
 
 

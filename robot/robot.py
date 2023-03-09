@@ -1,4 +1,4 @@
-import timer
+
 import wpilib
 import rev
 from ctre import WPI_TalonSRX
@@ -6,18 +6,17 @@ from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 import wpilib.drive
-from robotpy_ext.autonomous import AutonomousModeSelector
-import time
 
 from components.boom import Boom
 from components.grabber import grabber
 from components.limelight import aiming
 from components.drivetrain import DriveTrain
+from utilities.encoder import Encoder
 
 from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
-from ctre import WPI_TalonSRX
+from ctre import WPI_TalonFX
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -64,14 +63,17 @@ class SpartaBot(MagicRobot):
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
+        
 
         self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
-        self.talon_L_1 = WPI_TalonSRX(1)
-        self.talon_L_2 = WPI_TalonSRX(5)
+        self.talon_L_1 = WPI_TalonFX(4)
+        self.talon_L_2 = WPI_TalonFX(8)
 
-        self.talon_R_1 = WPI_TalonSRX(6)
-        self.talon_R_2 = WPI_TalonSRX(9)
+        self.talon_R_1 = WPI_TalonFX(7)
+        self.talon_R_2 = WPI_TalonFX(6)
+        self.talon_ENC1 = WPI_TalonSRX(0)
+        self.talon_ENC2 = WPI_TalonSRX(12)
 
         # self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         # self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
@@ -84,29 +86,7 @@ class SpartaBot(MagicRobot):
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
-    # def autonomousInit(self):
-    #     self.timer.start()
-    #     self.sd.putValue("Mode", "Autonomous")
-    #     print("Auton Beginning")
-    #     # Begins the autonomous timer, should be limited at 15 seconds
-
-    # def autonomous(self):
-
-    #     # def stageOne():
-    #     #     if self.timer.get() 
-
-
-
-    #     # if self.timer.get() < 3.0:
-    #     #     self.drivetrain.set_motors(-0.5, 0.0)
-    #     #     self.sd.putValue("Drivetrain: ", "Second Auton State...")
-    #     #     print("second state running")
-    #     # else:
-    #     #     self.drivetrain.set_motors(0.0, 0.0)
-    #     #     self.sd.putValue("Drivetrain: ", "Second Auton State...")
-    #     #     print("done")
-
-
+ 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
         '''Called when teleop starts; optional'''
@@ -115,9 +95,16 @@ class SpartaBot(MagicRobot):
         '''Called on each iteration of the control loop'''
 
         # drive controls
-        print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
+        
+        self.sensor = self.talon_ENC1.getSensorCollection()
+        MotorPosL = self.sensor.getQuadraturePosition()
+
+        self.sense = self.talon_ENC2.getSensorCollection()
+        MotorPosR = self.sense.getQuadraturePosition()
+
+
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # inverse values to get inverse controls
@@ -127,65 +114,78 @@ class SpartaBot(MagicRobot):
         else:
             # reset value to make robot stop moving
             self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
+            self.sd.putValue('Drivetrain: ', 'static')\
+
+
+
 
         # boom controls
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
 
-        # if (self.drive_controller.getLeftBumper()):
-        #     #extend_speed = 0
+        if (self.drive_controller.getLeftBumper()):
+            #extend_speed = 0
         
-        #     # left trigger retracts, while right trigger extends
-        #     self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
-        #     self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
+            # left trigger retracts, while right trigger extends
+            self.boom_arm.extender_speed -= self.drive_controller.getLeftTriggerAxis()
+            self.boom_arm.extender_speed += self.drive_controller.getRightTriggerAxis()
         
-        #     #self.boom_arm.set_extender(extend_speed)
+            #self.boom_arm.set_extender(extend_speed)
         
-        # elif self.drive_controller.getRightTriggerAxis() > 0.05:
-        #     #rotation_speed = 0
-        
-        
-        #     self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
+        elif self.drive_controller.getRightTriggerAxis() > 0.05:
+            #rotation_speed = 0
         
         
-        #     #self.boom_arm.set_rotator(rotation_speed)
-        #     #self.boom_rotator_spark.set(rotation_speed/4)
-        # elif self.drive_controller.getLeftTriggerAxis() > 0.05:
-        #     self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
-        
-        # else:
-        #     self.boom_arm.rotator_speed = 0
-        #     self.boom_arm.extender_speed = 0
+            self.boom_arm.rotator_speed = self.drive_controller.getRightTriggerAxis()/10
         
         
-        # if self.drive_controller.getXButton():
-        #     #self.testmotor.set(0.5)
-        #     self.boom_arm.rotator_speed = 0.5
-        #     print(self.boom_arm.rotator_speed)
+            #self.boom_arm.set_rotator(rotation_speed)
+            #self.boom_rotator_spark.set(rotation_speed/4)
+        elif self.drive_controller.getLeftTriggerAxis() > 0.05:
+            self.boom_arm.rotator_speed = -self.drive_controller.getLeftTriggerAxis()/10
         
-        # else:
-        #     #self.testmotor.set(0)
-        #     self.boom_rotator_spark.set(0)
+        else:
+            self.boom_arm.rotator_speed = 0
+            self.boom_arm.extender_speed = 0
         
-        # '''self.drivetrain's execute() method is automatically called'''
         
-        # if self.drive_controller.getYButtonPressed():
-        #     aiming.side_to_side(self)
-        #     aiming.forward_backward(self)
-        # if self.drive_controller.getYButtonReleased():
-        #     self.drive.arcadeDrive(0, 0, True)
+        if self.drive_controller.getXButton():
+            #self.testmotor.set(0.5)
+            self.boom_arm.rotator_speed = 0.5
+            print(self.boom_arm.rotator_speed)
+        
+        else:
+            #self.testmotor.set(0)
+            self.boom_rotator_spark.set(0)
+        
+        '''self.drivetrain's execute() method is automatically called'''
+        
+        if self.drive_controller.getYButtonPressed():
+                aiming.side_to_side(self)
+                aiming.forward_backward(self)
+        if self.drive_controller.getYButtonReleased():
+            self.drive.arcadeDrive(0, 0, True)
+
+        # Encoder printing from encoder.py
+        if self.drive_controller.getAButtonReleased():
+            Encoder.getEncoderLeft(self)
+            Encoder.getEncoderRight(self)
+            
         
         '''when the y button is pressed/released, Limelight's functions are called'''
         
 
-        # if self.drive_controller.getBButtonReleased():
-        #     grabber.turn_off_compressor(self)
+        if self.drive_controller.getBButtonReleased():
+            grabber.turn_off_compressor(self)
         
-        # if self.drive_controller.getAButtonReleased():
-        #     grabber.solenoid_toggle(self)
+        if self.drive_controller.getAButtonReleased():
+            grabber.solenoid_toggle(self)
 
-        # if self.drive_controller.getYButton():
+        if self.drive_controller.getYButton():
+            aiming.side_to_side(self)
+            
+        if self.drive_controller.getXButton():
+            aiming.forward_backward
 
 if __name__ == '__main__':
     # runs bot
