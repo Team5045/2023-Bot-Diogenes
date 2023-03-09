@@ -32,15 +32,16 @@ class aiming:
 
     def side_to_side(self):
         try:
+
             self.turn = NetworkTables.getTable("limelight").getNumber('tx', None) / 30.75
             self.sd.putValue("Limelight LR", self.turn)
             self.drivetrain.set_motors(0, self.turn)
             print(f"Limelight LR {self.turn}")
-        except Exception as e:
-            print(str(e))
 
-    def forward_backward(self):
-        try:
+            self.turn = self.table.getNumber('tx', None) / 30.75
+            print(f"turn {self.turn}")
+            # self.drive.arcadeDrive(self.turn, 0)
+
             self.move = NetworkTables.getTable("limelight").getNumber('ta', None)
             if abs(self.move) > 0.05:
                 if abs(self.move) > 1:
@@ -58,3 +59,16 @@ class aiming:
                 self.sd.putValue("Limelight FB", "perfect!")
         except Exception as e:
             print(str(e))
+
+            self.move = self.table.getNumber('ta', None)
+            print(f"move {self.move}")
+            if self.move < 10:
+                # self.drivetrain.set_motors(0.5, 0.0)
+                pass
+            elif self.move > 10:
+                # self.drivetrain.set_motors(-0,5, 0)
+                pass
+        except Exception as e:
+            print(e + "Did not work (Type 2)")
+
+

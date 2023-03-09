@@ -1,3 +1,4 @@
+
 import wpilib
 import rev
 from ctre import WPI_TalonFX
@@ -10,9 +11,16 @@ from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
 import wpilib.drive
+
 from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
+from utilities.encoder import Encoder
+
+from wpilib import MotorControllerGroup
+from wpilib.drive import DifferentialDrive
+from networktables import NetworkTable
+from ctre import WPI_TalonFX
 
 
 # Download and install stuff on the RoboRIO after imaging
@@ -61,6 +69,7 @@ class SpartaBot(MagicRobot):
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
+        
 
         self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
 
@@ -69,6 +78,10 @@ class SpartaBot(MagicRobot):
 
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
+
+        self.talon_ENC1 = WPI_TalonSRX(0)
+        self.talon_ENC2 = WPI_TalonSRX(12)
+
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
@@ -96,9 +109,17 @@ class SpartaBot(MagicRobot):
         '''
 
         # drive controls
-        # print("tele")
+
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
+        
+        self.sensor = self.talon_ENC1.getSensorCollection()
+        MotorPosL = self.sensor.getQuadraturePosition()
+
+        self.sense = self.talon_ENC2.getSensorCollection()
+        MotorPosR = self.sense.getQuadraturePosition()
+
+
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # inverse values to get inverse controls
@@ -108,12 +129,16 @@ class SpartaBot(MagicRobot):
         else:
             # reset value to make robot stop moving
             self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
+            self.sd.putValue('Drivetrain: ', 'static')\
+
+
+
 
         # boom controls
         # if left bumper button pressed, right and left triggers control boom extension
         #   else, they control angle
         speed = 0
+
 
         speed += self.drive_controller.getRightTriggerAxis()
         speed -= self.drive_controller.getLeftTriggerAxis()
