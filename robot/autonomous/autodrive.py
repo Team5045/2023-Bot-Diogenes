@@ -4,10 +4,8 @@ from components.drivetrain import DriveTrain
 # imported drivetrain from components folder
 
 from magicbot import AutonomousStateMachine, tunable, state, timed_state
-from networktables import NetworkTables, NetworkTable
-import wpilib
-import wpilib.drive
 import networktables
+
 
 class autoDrive(AutonomousStateMachine):
     DEFAULT = True
@@ -26,12 +24,3 @@ class autoDrive(AutonomousStateMachine):
         self.drivetrain.set_motors(0.0, 0.0)
         self.sd.putValue("Mode", "Autonomous Done")
     # Robot stops now that driving is finished, should then switch to teleop because magicbot
-
-
-
-
-
-
-
-
-
