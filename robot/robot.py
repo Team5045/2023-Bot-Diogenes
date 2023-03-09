@@ -6,7 +6,7 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-
+from components.gyro import Gyro
 from components.boom import Boom
 from components.grabber import Grabber
 import wpilib.drive
@@ -55,6 +55,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    gyro: Gyro
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -141,7 +142,32 @@ class SpartaBot(MagicRobot):
             
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
-        
+
+        #assign a button to gryo/ramp mode
+        if self.drive_controller.abuttonpressed():
+
+            while abuttonpressedagain() == False:
+                pitch = Gyro.getpitch()
+                if (pitch > 10): #this value is made up
+                    # inverse values to get inverse controls
+                    self.drivetrain.set_motors(-speed, angle) #these values shouldn't be speed and angle
+                    self.sd.putValue('Drivetrain: ', 'moving') #prob need to do something to pitch to get them
+
+                else:
+                    # reset value to make robot stop moving
+                    self.drivetrain.set_motors(0.0, 0.0)
+                    self.sd.putValue('Drivetrain: ', 'static')
+
+                if (pitch < -10): #this value is also made up
+                    # inverse values to get inverse controls
+                    self.drivetrain.set_motors(speed, angle)
+                    self.sd.putValue('Drivetrain: ', 'moving')
+
+                else:
+                    # reset value to make robot stop moving
+                    self.drivetrain.set_motors(0.0, 0.0)
+                    self.sd.putValue('Drivetrain: ', 'static')
+
 
 
 if __name__ == '__main__':
