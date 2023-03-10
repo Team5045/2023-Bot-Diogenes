@@ -42,7 +42,7 @@ INPUT_SENSITIVITY = 0.05
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
-
+MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
 MagicRobot.control_loop_wait_time = 0.05
 
 SPEED_MULTIPLIER = 1
@@ -71,17 +71,22 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonFX(6)
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
+        self.solenoid1.set(DoubleSolenoid.Value.kForward)
+        self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
+        self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        # self.limelight = NetworkTables.getTable("limelight")
+        # self.limelight.LEDState(3)
+        # print("limelight on")
         '''Called when teleop starts; optional'''
 
     def teleopPeriodic(self):
@@ -91,7 +96,7 @@ class SpartaBot(MagicRobot):
         '''
 
         # drive controls
-        print("tele")
+        # print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
@@ -118,18 +123,25 @@ class SpartaBot(MagicRobot):
 
         if (abs(speed) > INPUT_SENSITIVITY):
             if self.drive_controller.getLeftBumper():
-                # divide by 10 to slow down extendor (prevent overwinding)
-                self.boom_arm.set_extender(speed/10)
+                # limit is 0.15 of max speed (prevent overwinding)
+                self.boom_arm.set_extender(3*speed/20)
             else:
-                self.boom_arm.set_rotator(speed)
+                self.boom_arm.set_rotator(3*speed/20)
 
         # self.drivetrain's execute() method is automatically called
 
-        if self.drive_controller.getBButtonReleased():
+        if self.drive_controller.getLeftBumperReleased():
             Grabber.turn_off_compressor(self)
 
-        if self.drive_controller.getAButtonReleased():
+        if self.drive_controller.getRightBumperReleased():
             Grabber.solenoid_toggle(self)
+        
+        if self.drive_controller.getYButton():
+            aiming.side_to_side(self)
+            
+        if self.drive_controller.getXButton():
+            aiming.forward_backward(self)
+        
 
 
 if __name__ == '__main__':
