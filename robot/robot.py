@@ -70,14 +70,17 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
+        self.boom_rotator_spark = WPI_TalonFX(3)
+
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
         self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
+        self.gear_solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        #self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -124,13 +127,13 @@ class SpartaBot(MagicRobot):
         if (abs(speed) > INPUT_SENSITIVITY):
             if self.drive_controller.getLeftBumper():
                 # limit is 0.15 of max speed (prevent overwinding)
-                self.boom_arm.set_extender(3*speed/20)
+                self.boom_arm.set_extender(speed/2)
             else:
-                self.boom_arm.set_rotator(3*speed/20)
+                self.boom_arm.set_rotator(speed/5)
 
         # self.drivetrain's execute() method is automatically called
 
-        if self.drive_controller.getLeftBumperReleased():
+        if self.drive_controller.getAButtonReleased():
             Grabber.turn_off_compressor(self)
 
         if self.drive_controller.getRightBumperReleased():
@@ -141,6 +144,10 @@ class SpartaBot(MagicRobot):
             
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
+        
+        if self.drive_controller.getBButtonReleased():
+            self.gear_solenoid.toggle()
+
         
 
 
