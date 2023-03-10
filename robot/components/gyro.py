@@ -9,6 +9,8 @@ class Gryo:
     def setup(self):
         self.calibrate() #hopefully this works
         self.gyro = navx.AHRS
+        self.angle = 0
+        self.gain = 1
 
         #getPitch() <-- get this, doing something with motor,
         #robot doesn't fall off platform
