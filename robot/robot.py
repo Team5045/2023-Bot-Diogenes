@@ -71,6 +71,7 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonFX(6)
 
         self.boom_rotator_spark = WPI_TalonFX(3)
+        
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
@@ -129,6 +130,7 @@ class SpartaBot(MagicRobot):
                 # limit is 0.15 of max speed (prevent overwinding)
                 self.boom_arm.set_extender(speed/2)
             else:
+                self.boom_arm.set_Setpoint(0.15)
                 self.boom_arm.set_rotator(speed/5)
 
         # self.drivetrain's execute() method is automatically called
