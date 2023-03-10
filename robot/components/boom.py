@@ -1,6 +1,7 @@
 from networktables import NetworkTable
 import rev
 from utils import limit
+from ctre import TalonFX
 
 
 STRING_LEN = 28.5  # (inches)
@@ -10,7 +11,7 @@ class Boom:
 
     # get sparks from main robot via variable injection
     boom_extender_spark: rev.CANSparkMax
-    boom_rotator_spark: rev.CANSparkMax
+    boom_rotator_spark: TalonFX
 
     sd: NetworkTable
 
