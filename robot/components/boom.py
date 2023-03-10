@@ -5,16 +5,28 @@ from ctre import TalonFX
 
 
 STRING_LEN = 28.5  # (inches)
-
+kP: float
+kI: float
+kD: float
 
 class Boom:
 
-    # get sparks from main robot via variable injection
     boom_extender_spark: rev.CANSparkMax
     boom_rotator_spark: TalonFX
 
     sd: NetworkTable
 
+
+    def setPID(self):
+        self.kP = kP
+        self.kI = kI
+        self.kD = kD
+    
+    
+
+
+    # get sparks from main robot via variable injection
+    
     def setup(self):
         """instead of __init__(), use setup() to initialize values (works with magicrobot variable injection)"""
         self.extender_speed = 0
