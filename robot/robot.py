@@ -6,6 +6,7 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
+from components.gyro import Gyro
 from components.boom import Boom
 from components.grabber import Grabber
 from components.gyro import Gyro
