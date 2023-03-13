@@ -144,7 +144,7 @@ class SpartaBot(MagicRobot):
         if (self.drive_controller.getAButtonReleased()):
             Grabber.solenoid_toggle(self)
         
-        if (self.drive_controller.getStartButtonReleased):
+        if (self.drive_controller.getStartButtonReleased()):
             Grabber.turn_off_compressor(self) # actually more like toggle compressor
         
         if self.drive_controller.getYButton():
