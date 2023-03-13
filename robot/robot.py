@@ -81,7 +81,7 @@ class SpartaBot(MagicRobot):
         self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        #self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -148,10 +148,10 @@ class SpartaBot(MagicRobot):
             
         if self.drive_controller.getBButtonReleased():
             self.gear_solenoid.toggle()
-
-        pitch = Gyro.getPitch()
+    
+        pitch = self.gyro.pitch
         if pitch > 10:
-            self.drivetrain.set_motors(pitch * 0.05, angle)
+            self.drivetrain.set_motors(pitch * 0.05, 0.0)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -162,7 +162,7 @@ class SpartaBot(MagicRobot):
 
         if pitch < -10: #this value is also made up
             # inverse values to get inverse controls
-            self.drivetrain.set_motors(pitch * -0.05, angle)
+            self.drivetrain.set_motors(pitch * -0.05, 0.0)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:

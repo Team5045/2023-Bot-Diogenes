@@ -1,1 +1,40 @@
-{}
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [1]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[7]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[7]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Autonomous Mode": "String Chooser"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      },
+      "autonomous": {
+        "autodrive": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  }
+}
