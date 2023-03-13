@@ -122,7 +122,7 @@ class SpartaBot(MagicRobot):
         rot_speed += self.drive_controller.getRightTriggerAxis()
         rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        # self.boom_arm.set_rotator(0)
+        self.boom_arm.set_rotator(0)
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed/5)
