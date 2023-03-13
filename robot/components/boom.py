@@ -20,6 +20,9 @@ class Boom:
         self.extender_speed = 0
         self.rotator_speed = 0
 
+        # self.extender_hall_encoder = self.boom_extender_spark.getEncoder()
+        # self.extender_hall_encoder.setPosition(0)
+
         # for now, there are not limits to how much you can wind the string (with extender)
         #   in the future, add safety mechanism to ensure string is not overwound
         # self.slack = STRING_LEN
