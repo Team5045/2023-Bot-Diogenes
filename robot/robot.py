@@ -6,9 +6,9 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-from components.gyro import Gyro
 from components.boom import Boom
 from components.grabber import Grabber
+from components.gyro import Gyro
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
@@ -55,6 +55,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    gyro: Gyro
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -70,14 +71,17 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
+        # self.boom_rotator_spark = WPI_TalonFX(3)
+
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
         self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
+        self.gear_solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        #self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -142,31 +146,9 @@ class SpartaBot(MagicRobot):
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
             
-            
-                    #assign a button to gryo/ramp mode
-        if self.drive_controller.abuttonpressed():
+        if self.drive_controller.getBButtonReleased():
+            self.gear_solenoid.toggle()
 
-            while abuttonpressedagain() == False:
-                pitch = Gyro.getpitch()
-                if (pitch > 5): #this value is made up
-                    # inverse values to get inverse controls
-                    self.drivetrain.set_motors(-pitch * 0.05, 0.0) #these values shouldn't be speed and angle
-                    self.sd.putValue('Drivetrain: ', 'moving') #prob need to do something to pitch to get them
-
-                else:
-                    # reset value to make robot stop moving
-                    self.drivetrain.set_motors(0.0, 0.0)
-                    self.sd.putValue('Drivetrain: ', 'static')
-
-                if (pitch < -5): #this value is also made up
-                    # inverse values to get inverse controls
-                    self.drivetrain.set_motors(pitch * 0.05, 0.0)
-                    self.sd.putValue('Drivetrain: ', 'moving')
-
-                else:
-                    # reset value to make robot stop moving
-                    self.drivetrain.set_motors(0.0, 0.0)
-                    self.sd.putValue('Drivetrain: ', 'static')
         
 
 
