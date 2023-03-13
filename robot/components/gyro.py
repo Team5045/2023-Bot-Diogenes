@@ -2,6 +2,7 @@ import wpilib
 import navx
 from wpilib.interfaces import Gyro
 from networktables import NetworkTable
+from components.drivetrain import DriveTrain
 
 class Gyro:
 #Gyro.calibrate() should be activated,
@@ -14,6 +15,9 @@ class Gyro:
 
         #getPitch() <-- get this, doing something with motor,
         #robot doesn't fall off platform
+
+    def pitchget(self):
+        return self.gyro.getPitch()
         
     def execute(self):
 

@@ -148,27 +148,29 @@ class SpartaBot(MagicRobot):
             
         if self.drive_controller.getBButtonReleased():
             self.gear_solenoid.toggle()
-    
-        pitch = self.gyro.pitch
-        if pitch > 10:
-            self.drivetrain.set_motors(pitch * 0.05, 0.0)
-            self.sd.putValue('Drivetrain: ', 'moving')
 
-        else:
-            # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
+        if self.drive_controller.getBackButtonPressed():
+            pitch = Gyro.pitchget()
+            if pitch > 10:
+                self.drivetrain.set_motors(pitch * 0.05, 0.0)
+                self.sd.putValue('Drivetrain: ', 'moving')
+
+            else:
+                # reset value to make robot stop moving
+                self.drivetrain.set_motors(0.0, 0.0)
+                self.sd.putValue('Drivetrain: ', 'static')
 
 
-        if pitch < -10: #this value is also made up
+            if pitch < -10: #this value is also made up
             # inverse values to get inverse controls
-            self.drivetrain.set_motors(pitch * -0.05, 0.0)
-            self.sd.putValue('Drivetrain: ', 'moving')
+                self.drivetrain.set_motors(pitch * -0.05, 0.0)
+                self.sd.putValue('Drivetrain: ', 'moving')
 
-        else:
+            else:
             # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
+                self.drivetrain.set_motors(0.0, 0.0)
+                self.sd.putValue('Drivetrain: ', 'static')
+                
 
 
 if __name__ == '__main__':
