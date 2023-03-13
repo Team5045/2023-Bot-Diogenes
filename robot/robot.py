@@ -6,7 +6,7 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-
+from components.encoder import encoders
 from components.boom import Boom
 from components.grabber import Grabber
 import wpilib.drive
@@ -147,6 +147,11 @@ class SpartaBot(MagicRobot):
         
         if self.drive_controller.getBButtonReleased():
             self.gear_solenoid.toggle()
+        
+        if self.drive_controller.getAButtonReleased():
+            encoders.left(self)
+            encoders.right(self)
+
 
         
 
