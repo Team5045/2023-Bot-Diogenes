@@ -14,7 +14,6 @@ class Grabber:
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
-
     def turn_off_compressor(MagicRobot):
         if (MagicRobot.compressor.isEnabled()):
             MagicRobot.compressor.disable()

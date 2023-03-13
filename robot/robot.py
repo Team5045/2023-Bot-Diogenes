@@ -71,17 +71,17 @@ class SpartaBot(MagicRobot):
         self.talon_R_2 = WPI_TalonFX(6)
 
         self.boom_rotator_spark = WPI_TalonFX(3)
-        
 
         self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
         self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
         self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
-        self.gear_solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.gear_solenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 0, 1)
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid2.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        #self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        # self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -106,7 +106,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, angle)
+            self.drivetrain.set_motors(-speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -130,8 +130,8 @@ class SpartaBot(MagicRobot):
                 # limit is 0.15 of max speed (prevent overwinding)
                 self.boom_arm.set_extender(speed/2)
             else:
-                self.boom_arm.set_Setpoint(0.15)
-                self.boom_arm.set_rotator(speed/5)
+                self.boom_arm.set_Setpoint(-0.15)
+                self.boom_arm.set_rotator(speed/3)
 
         # self.drivetrain's execute() method is automatically called
 
@@ -140,17 +140,15 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightBumperReleased():
             Grabber.solenoid_toggle(self)
-        
+
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
-            
+
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
-        
+
         if self.drive_controller.getBButtonReleased():
             self.gear_solenoid.toggle()
-
-        
 
 
 if __name__ == '__main__':
