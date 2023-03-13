@@ -9,7 +9,6 @@ from components.drivetrain import DriveTrain
 from components.gyro import Gyro
 from components.boom import Boom
 from components.grabber import Grabber
-from components.gyro import Gyro
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
