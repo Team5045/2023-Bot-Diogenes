@@ -10,13 +10,11 @@ class encoders():
     # Left encoder values getting from here
     def left(self):
         self.senseleft = LeftEncoder.getSensorCollection()
-        print(self.senseleft.getQuadraturePosition())
         print(self.senseleft.getQuadratureVelocity())
     
     # Right encoder values getting from here
     def right(self):
         self.senseright = RightEncoder.getSensorCollection()
-        print(self.senseright.getQuadraturePosition())
         print(self.senseright.getQuadratureVelocity())
 
 
