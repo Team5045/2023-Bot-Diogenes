@@ -104,11 +104,11 @@ class SpartaBot(MagicRobot):
         # drive controls
         # print("tele")
         angle = self.drive_controller.getRightX()
-        rot_speed = self.drive_controller.getLeftY()
+        speed = self.drive_controller.getLeftY()
 
-        if (abs(angle) > INPUT_SENSITIVITY or abs(rot_speed) > INPUT_SENSITIVITY):
+        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # NOTE: to make the front of the robot the tower, remove '-'
-            self.drivetrain.set_motors(-rot_speed, -angle)
+            self.drivetrain.set_motors(-speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
