@@ -50,6 +50,7 @@ ANGLE_MULTIPLIER = 1
 
 WINDING_SPEED = .5
 
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
@@ -63,7 +64,8 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(
+            0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -76,14 +78,13 @@ class SpartaBot(MagicRobot):
         self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
 
         self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
-        self.solenoid1.set(DoubleSolenoid.Value.kForward)
-        self.solenoid2: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
-        self.solenoid2.set(DoubleSolenoid.Value.kForward)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
 
-        self.gear_solenoid: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid1.set(DoubleSolenoid.Value.kForward)
+        self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        #self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        # self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -128,7 +129,7 @@ class SpartaBot(MagicRobot):
             self.boom_arm.set_rotator(rot_speed/5)
 
         # boom extension: bumpers
-        # NOTE: it is assumed that the boom arm is fully retracted 
+        # NOTE: it is assumed that the boom arm is fully retracted
         wind_speed = 0
 
         if (self.drive_controller.getRightBumper()):
@@ -139,24 +140,21 @@ class SpartaBot(MagicRobot):
 
         self.boom_arm.set_extender(wind_speed)
 
-
         # grabber: A button to open/close (switches from one state to another)
         if (self.drive_controller.getAButtonReleased()):
             Grabber.solenoid_toggle(self)
-        
-        if (self.drive_controller.getStartButtonReleased()):
-            Grabber.turn_off_compressor(self) # actually more like toggle compressor
-        
+
+        if (self.drive_controller.getBButtonReleased()):
+            Grabber.toggle_compressor(self)
+
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
-            
+
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
-        
-        if self.drive_controller.getBButtonReleased():
-            self.gear_solenoid.toggle()
 
-        
+        if self.drive_controller.getRightStickButtonReleased():
+            self.solenoid_gear.toggle(self)
 
 
 if __name__ == '__main__':
