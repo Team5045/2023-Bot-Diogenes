@@ -132,10 +132,10 @@ class SpartaBot(MagicRobot):
         wind_speed = 0
 
         if (self.drive_controller.getRightBumper()):
-            wind_speed += WINDING_SPEED
+            wind_speed -= WINDING_SPEED
 
         if (self.drive_controller.getLeftBumper()):
-            wind_speed -= WINDING_SPEED
+            wind_speed += WINDING_SPEED
 
         self.boom_arm.set_extender(wind_speed)
 
