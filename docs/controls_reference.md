@@ -6,7 +6,7 @@
 | — Drive Controls — |  |
 | Forward/Backward | Left Joystick (front/back) |
 | Turning | Right Joystick (left/right) |
-| Shift Gears | Right Joystick (Press) |
+| Shift Gears | Right Joystick (press) |
 | — Boom Arm Controls — |  |
 | Rotate Upwards | Left Trigger |
 | Rotate Downwards | Right Trigger |
@@ -14,7 +14,7 @@
 | Retract | Right Bumper |
 | — Grabber — | |
 | Open/Close Grabber | A Button |
-| Toggle Compressor | Start Button |
+| Toggle Compressor | B Button |
 | — Aiming (WIP) — | |
 | Auto Turning | Y Button |
 | Auto Front/Back | X Button |
