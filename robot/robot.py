@@ -107,8 +107,8 @@ class SpartaBot(MagicRobot):
         rot_speed = self.drive_controller.getLeftY()
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(rot_speed) > INPUT_SENSITIVITY):
-            # inverse values to get inverse controls
-            self.drivetrain.set_motors(-rot_speed, angle)
+            # NOTE: to make the front of the robot the tower, remove '-'
+            self.drivetrain.set_motors(-rot_speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
