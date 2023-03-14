@@ -6,7 +6,7 @@
 | — Drive Controls — |  |
 | Forward/Backward | Left Joystick (front/back) |
 | Turning | Right Joystick (left/right) |
-| Shift Gears | B Button |
+| Shift Gears | Right Joystick (Press) |
 | — Boom Arm Controls — |  |
 | Rotate Upwards | Left Trigger |
 | Rotate Downwards | Right Trigger |
