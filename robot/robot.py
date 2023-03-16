@@ -109,7 +109,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # NOTE: to make the front of the robot the tower, remove '-'
-            self.drivetrain.set_motors(-speed, -angle)
+            self.drivetrain.set_motors(speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
