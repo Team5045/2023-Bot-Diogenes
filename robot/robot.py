@@ -154,7 +154,7 @@ class SpartaBot(MagicRobot):
             aiming.forward_backward(self)
 
         if self.drive_controller.getRightStickButtonReleased():
-            self.solenoid_gear.toggle(self)
+            self.solenoid_gear.toggle()
 
 
 if __name__ == '__main__':
