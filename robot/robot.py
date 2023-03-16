@@ -6,9 +6,9 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-
 from components.boom import Boom
 from components.grabber import Grabber
+from components.encoders import encoders
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
@@ -155,6 +155,9 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
+        
+        if self.drive_controller.getStartButtonReleased():
+            
 
 
 if __name__ == '__main__':
