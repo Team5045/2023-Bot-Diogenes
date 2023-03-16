@@ -157,6 +157,9 @@ class SpartaBot(MagicRobot):
             self.solenoid_gear.toggle()
         
         if self.drive_controller.getStartButtonReleased():
+            encoders.left(self)
+            encoders.right(self)
+            
             
 
 
