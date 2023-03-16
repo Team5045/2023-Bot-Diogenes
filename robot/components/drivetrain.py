@@ -4,7 +4,7 @@ from networktables import NetworkTable
 
 from ctre import WPI_TalonFX
 
-from utils import limit
+from tools.utils import Lim
 
 
 SPEED_MULTIPLIER = 1
@@ -45,8 +45,8 @@ class DriveTrain:
         angle: percentage of full rotation, ccw is positive
         Puts values into smartdashboard to be called by arcadeDrive() later in execute()
         """
-        self.speed = limit(speed, [-1, 1])
-        self.angle = limit(angle, [-1, 1])
+        self.speed = Lim.limit(speed, [-1, 1])
+        self.angle = Lim.limit(angle, [-1, 1])
 
         self.sd.putValue("Speed", self.speed)
         self.sd.putValue("Angle", self.angle)
