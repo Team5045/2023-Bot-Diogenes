@@ -13,7 +13,7 @@ import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
-
+from ctre import NeutralMode
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -49,7 +49,7 @@ SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
 WINDING_SPEED = .5
-
+NEUTRAL_MODE = NeutralMode(2)
 
 class SpartaBot(MagicRobot):
 
@@ -84,10 +84,10 @@ class SpartaBot(MagicRobot):
         self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
         self.boom_rotator_spark = WPI_TalonFX(3)
 
-        self.talon_L_1.setNeutralMode(2)
-        self.talon_L_2.setNeutralMode(2)
-        self.talon_R_1.setNeutralMode(2)
-        self.talon_R_2.setNeutralMode(2)
+        self.talon_L_1.setNeutralMode(NEUTRAL_MODE)
+        self.talon_L_2.setNeutralMode(NEUTRAL_MODE)
+        self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
+        self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
