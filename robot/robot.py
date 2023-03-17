@@ -6,9 +6,9 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-
 from components.boom import Boom
 from components.grabber import Grabber
+from components.encoders import encoders
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
@@ -57,6 +57,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    grabber : Grabber
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -129,6 +130,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed/5)
+            print(rot_speed)
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
@@ -144,10 +146,10 @@ class SpartaBot(MagicRobot):
 
         # grabber: A button to open/close (switches from one state to another)
         if (self.drive_controller.getAButtonReleased()):
-            Grabber.solenoid_toggle(self)
+            self.grabber.solenoid_toggle(self)
 
         if (self.drive_controller.getBButtonReleased()):
-            Grabber.toggle_compressor(self)
+            self.grabber.toggle_compressor(self)
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
@@ -157,7 +159,6 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
-        
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
