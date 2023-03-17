@@ -145,10 +145,10 @@ class SpartaBot(MagicRobot):
         self.boom_arm.set_extender(wind_speed)
 
         # grabber: A button to open/close (switches from one state to another)
-        if (self.drive_controller.getAButtonReleased()):
+        if self.drive_controller.getAButtonReleased():
             self.grabber.solenoid_toggle(self)
 
-        if (self.drive_controller.getBButtonReleased()):
+        if self.drive_controller.getBButtonReleased():
             self.grabber.toggle_compressor(self)
 
         if self.drive_controller.getYButton():
