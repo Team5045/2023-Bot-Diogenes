@@ -65,16 +65,13 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller: wpilib.XboxController = wpilib.XboxController(
-            0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
 
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
-
-        self.boom_rotator_spark = WPI_TalonFX(3)
 
         self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
 
@@ -85,7 +82,12 @@ class SpartaBot(MagicRobot):
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
         self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        # self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = WPI_TalonFX(3)
+
+        self.talon_L_1.setNeutralMode(2)
+        self.talon_L_2.setNeutralMode(2)
+        self.talon_R_1.setNeutralMode(2)
+        self.talon_R_2.setNeutralMode(2)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -110,7 +112,7 @@ class SpartaBot(MagicRobot):
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
             # NOTE: to make the front of the robot the tower, remove '-'
-            self.drivetrain.set_motors(-speed, -angle)
+            self.drivetrain.set_motors(speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -157,13 +159,6 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
-        
-        if self.drive_controller.getStartButtonReleased():
-            encoders.left(self)
-            encoders.right(self)
-            
-            
-
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
