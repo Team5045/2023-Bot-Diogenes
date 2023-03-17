@@ -16,7 +16,7 @@ class autoCharge(AutonomousStateMachine):
     sd: networktables.NetworkTable
     drivetrain: DriveTrain
     boom_arm: Boom
-    # grabber: Grabber
+    grabber: Grabber
 
     
     @timed_state(duration = 3, next_state = "pause1",  first = True)
@@ -37,7 +37,7 @@ class autoCharge(AutonomousStateMachine):
     @timed_state(duration = 3, next_state = "retract")
     def Drop(self):
         self.boom_arm.set_extender(0) 
-        Grabber.solenoid_toggle()
+        self.grabber.solenoid_toggle()
         self.sd.putValue("Mode: ", "Dropping")
 
     @timed_state(duration = 3, next_state = "Moveback")

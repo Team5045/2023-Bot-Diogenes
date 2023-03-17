@@ -57,6 +57,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    grabber : Grabber
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -143,10 +144,10 @@ class SpartaBot(MagicRobot):
 
         # grabber: A button to open/close (switches from one state to another)
         if (self.drive_controller.getAButtonReleased()):
-            Grabber.solenoid_toggle(self)
-    
+            self.grabber.solenoid_toggle(self)
+
         if (self.drive_controller.getBButtonReleased()):
-            Grabber.toggle_compressor(self)
+            self.grabber.toggle_compressor(self)
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
