@@ -20,10 +20,10 @@ class encoders():
         self.senseright = RightEncoder.getSensorCollection()
         print(self.senseright.getQuadratureVelocity())
 
-# class FalconEncoder():
+class FalconEncoder():
     
-#     def getpos(self):
-#         Position = ArmEnc.getSensorCollection()
+    def getpos(self):
+        Position = ArmEnc.getSensorCollection()
         
 
 
