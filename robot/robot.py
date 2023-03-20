@@ -9,8 +9,8 @@ from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
 from components.encoders import encoders
+from components.gyro import gyro
 import wpilib.drive
-from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
 from ctre import NeutralMode
