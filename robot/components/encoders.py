@@ -23,7 +23,8 @@ class encoders():
 class FalconEncoder():
     
     def getpos(self):
-        Position = ArmEnc.getSensorCollection()
+        self.position = ArmEnc.getSensorCollection()
+        pos = self.position.getIntegratedSensorPosition()
         
 
 

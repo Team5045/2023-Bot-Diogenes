@@ -2,6 +2,7 @@ from networktables import NetworkTable
 import rev
 from tools.utils import Lim
 from ctre import TalonFX
+from components.encoders import encoders
 
 
 STRING_LEN = 28.5  # (inches)
@@ -41,3 +42,5 @@ class Boom:
 
         self.boom_extender_spark.set(self.extender_speed)
         self.boom_rotator_spark.set(self.rotator_speed)
+        
+

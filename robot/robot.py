@@ -4,6 +4,7 @@ from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
+import navx
 
 from components.drivetrain import DriveTrain
 from components.boom import Boom
@@ -89,6 +90,11 @@ class SpartaBot(MagicRobot):
         self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
         self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
 
+        self.navx = navx.AHRS.create_spi()
+
+    def disabledInit(self) -> None:
+        self.navx.reset()
+    
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -153,12 +159,14 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
-
-        if self.drive_controller.getXButton():
             aiming.forward_backward(self)
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
+
+        if self.drive_controller.getXButtonPressed():
+            gyro.balancing(self)
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
