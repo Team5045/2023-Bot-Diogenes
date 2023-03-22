@@ -6,14 +6,14 @@ from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
 
 from components.drivetrain import DriveTrain
-
 from components.boom import Boom
 from components.grabber import Grabber
+from components.encoders import encoders
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
-
+from ctre import NeutralMode
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -42,12 +42,14 @@ INPUT_SENSITIVITY = 0.05
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
-
+MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
 MagicRobot.control_loop_wait_time = 0.05
 
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
+WINDING_SPEED = .5
+NEUTRAL_MODE = NeutralMode(2)
 
 class SpartaBot(MagicRobot):
 
@@ -55,6 +57,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    grabber : Grabber
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -62,7 +65,7 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -70,18 +73,30 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
-        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
 
-        self.boom_extender_spark = rev.CANSparkMax(2, MOTOR_BRUSHED)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHED)
+        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+
+        self.solenoid1.set(DoubleSolenoid.Value.kForward)
+        self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
+
+        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = WPI_TalonFX(3)
+
+        self.talon_L_1.setNeutralMode(NEUTRAL_MODE)
+        self.talon_L_2.setNeutralMode(NEUTRAL_MODE)
+        self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
+        self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        # self.limelight = NetworkTables.getTable("limelight")
+        # self.limelight.LEDState(3)
+        # print("limelight on")
         '''Called when teleop starts; optional'''
 
     def teleopPeriodic(self):
@@ -91,13 +106,13 @@ class SpartaBot(MagicRobot):
         '''
 
         # drive controls
-        print("tele")
+        # print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, angle)
+            # NOTE: to make the front of the robot the tower, remove '-'
+            self.drivetrain.set_motors(speed, -angle)
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -105,32 +120,45 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
-        # boom controls
-        # if left bumper button pressed, right and left triggers control boom extension
-        #   else, they control angle
-        speed = 0
+        # boom rotation: left/right triggers
+        rot_speed = 0
 
-        speed += self.drive_controller.getRightTriggerAxis()
-        speed -= self.drive_controller.getLeftTriggerAxis()
+        rot_speed += self.drive_controller.getRightTriggerAxis()
+        rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)
 
-        if (abs(speed) > INPUT_SENSITIVITY):
-            if self.drive_controller.getLeftBumper():
-                # divide by 10 to slow down extendor (prevent overwinding)
-                self.boom_arm.set_extender(speed/10)
-            else:
-                self.boom_arm.set_rotator(speed)
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_arm.set_rotator(rot_speed/5)
+            print(rot_speed)
 
-        # self.drivetrain's execute() method is automatically called
+        # boom extension: bumpers
+        # NOTE: it is assumed that the boom arm is fully retracted
+        wind_speed = 0
+
+        if (self.drive_controller.getRightBumper()):
+            wind_speed -= WINDING_SPEED
+
+        if (self.drive_controller.getLeftBumper()):
+            wind_speed += WINDING_SPEED
+
+        self.boom_arm.set_extender(wind_speed)
+
+        # grabber: A button to open/close (switches from one state to another)
+        if self.drive_controller.getAButtonReleased():
+            self.grabber.solenoid_toggle()
 
         if self.drive_controller.getBButtonReleased():
-            Grabber.turn_off_compressor(self)
+            self.grabber.toggle_compressor(self)
 
-        if self.drive_controller.getAButtonReleased():
-            Grabber.solenoid_toggle(self)
+        if self.drive_controller.getYButton():
+            aiming.side_to_side(self)
 
+        if self.drive_controller.getXButton():
+            aiming.forward_backward(self)
+
+        if self.drive_controller.getRightStickButtonReleased():
+            self.solenoid_gear.toggle()
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)

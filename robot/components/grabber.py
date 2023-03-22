@@ -4,19 +4,26 @@ from magicbot import MagicRobot
 
 
 class Grabber:
+    
+    compressor : wpilib.Compressor
+    solenoid1 : wpilib.DoubleSolenoid
+    solenoid_gear : wpilib.DoubleSolenoid
+
 
     def setup(self):
+        pass
 
-        PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
-        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
-        self.solenoid.set(DoubleSolenoid.Value.kForward)
-
-    def turn_off_compressor(MagicRobot):
-        if (MagicRobot.compressor.isEnabled()):
-            MagicRobot.compressor.disable()
+    def toggle_compressor(self):
+        if (self.compressor.isEnabled()):
+            self.compressor.disable()
         else:
-            MagicRobot.compressor.enableDigital()
+            self.compressor.enableDigital()
 
-    def solenoid_toggle(MagicRobot):
-        MagicRobot.solenoid.toggle()
+    def solenoid_toggle(self):
+        self.solenoid1.toggle()
+
+    def shift_gears(self):
+        self.solenoid_gear.toggle()
+
+    def execute(self):
+        pass
