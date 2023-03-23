@@ -32,7 +32,8 @@ class aiming:
 
     def side_to_side(self):
         try:
-            self.turn = NetworkTables.getTable("limelight").getNumber('tx', None) / 30.75
+            self.turn = NetworkTables.getTable(
+                "limelight").getNumber('tx', None) / 30.75
             self.sd.putValue("Limelight LR", self.turn)
             self.drivetrain.set_motors(0, self.turn)
             print(f"Limelight LR {self.turn}")
@@ -41,7 +42,8 @@ class aiming:
 
     def forward_backward(self):
         try:
-            self.move = NetworkTables.getTable("limelight").getNumber('ta', None)
+            self.move = NetworkTables.getTable(
+                "limelight").getNumber('ta', None)
             if abs(self.move) > 0.05:
                 if abs(self.move) > 1:
                     if (self.move < 0):
