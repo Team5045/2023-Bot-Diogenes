@@ -14,6 +14,7 @@ from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
 
+from Controllers.Rotate_Controller import Rotate_Controller
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -82,7 +83,7 @@ class SpartaBot(MagicRobot):
 
         self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
         # self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
-
+        
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -136,7 +137,7 @@ class SpartaBot(MagicRobot):
         # self.drivetrain's execute() method is automatically called
 
         if self.drive_controller.getAButtonReleased():
-            Grabber.turn_off_compressor(self)
+            Grabber.turn_off_compressor()
 
         if self.drive_controller.getRightBumperReleased():
             Grabber.solenoid_toggle(self)

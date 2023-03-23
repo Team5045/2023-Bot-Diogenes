@@ -3,6 +3,7 @@ import rev
 from utils import limit
 from ctre import WPI_TalonFX
 
+from Controllers.Rotate_Controller import Rotate_Controller
 
 STRING_LEN = 28.5  # (inches)
 
@@ -26,10 +27,13 @@ class Boom:
 
         self.sd.putValue("Boom Extender Speed: ", self.extender_speed)
 
-    def set_rotator(self, motor_speed: float):
-        self.rotator_speed = limit(motor_speed, [-1, 1])
-
-        self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
+    #def set_rotator(self, motor_speed: float):
+    #    self.rotator_speed = limit(motor_speed, [-1, 1])
+#
+    #    self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
+    
+    def set_rotator(self, motor_position: float):
+        self.extender_position = self
 
     def execute(self):
 

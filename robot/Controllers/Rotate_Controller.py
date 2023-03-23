@@ -20,9 +20,9 @@ class Rotate_Controller:
         self.angle = None
         self.angle_controller = PIDController(
             Kp = self.kP,
-            Ki=self.kI,
-            Kd=self.kD,
-            Kf=self.kF,
+            Ki = self.kI,
+            Kd = self.kD,
+            Kf = self.kF,
             source = self.get_angle,
             output = self.pid_Write_angle
         )
