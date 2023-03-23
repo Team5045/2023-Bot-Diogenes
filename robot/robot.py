@@ -151,10 +151,10 @@ class SpartaBot(MagicRobot):
 
         # grabber: A button to open/close (switches from one state to another)
         if self.drive_controller.getAButtonReleased():
-            Grabber.turn_off_compressor(self)
+            Grabber.turn_off_compressor()
 
         if self.drive_controller.getBButtonReleased():
-            self.grabber.toggle_compressor(self)
+            self.grabber.toggle_compressor()
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
