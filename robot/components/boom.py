@@ -1,7 +1,9 @@
 from networktables import NetworkTable
 import rev
+
 from utils import limit
 from ctre import WPI_TalonFX
+
 
 
 STRING_LEN = 28.5  # (inches)
@@ -21,13 +23,14 @@ class Boom:
         self.extender_speed = 0
         self.rotator_speed = 0
 
+
     def set_extender(self, motor_speed: float):
-        self.extender_speed = limit(motor_speed, [-1, 1])
+        self.extender_speed = Lim.limit(motor_speed, [-1, 1])
 
         self.sd.putValue("Boom Extender Speed: ", self.extender_speed)
 
     def set_rotator(self, motor_speed: float):
-        self.rotator_speed = limit(motor_speed, [-1, 1])
+        self.rotator_speed = Lim.limit(motor_speed, [-1, 1])
 
         self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
 
