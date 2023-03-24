@@ -4,7 +4,6 @@ import rev
 from tools.utils import Lim
 from ctre import WPI_TalonFX
 
-
 from Controllers.Rotate_Controller import Rotate_Controller
 
 STRING_LEN = 28.5  # (inches)
@@ -14,6 +13,7 @@ class Boom:
 
     boom_extender_motor: rev.CANSparkMax
     boom_rotator_motor: WPI_TalonFX
+    rotate_controller: Rotate_Controller
 
     sd: NetworkTable
 
@@ -23,17 +23,20 @@ class Boom:
         """instead of __init__(), use setup() to initialize values (works with magicrobot variable injection)"""
         self.extender_speed = 0
         self.rotator_speed = 0
-
+        self.rotator_position = 0
 
     def set_extender(self, motor_speed: float):
         self.extender_speed = Lim.limit(motor_speed, [-1, 1])
 
         self.sd.putValue("Boom Extender Speed: ", self.extender_speed)
 
-    def set_rotator(self, motor_speed: float):
-        self.rotator_speed = Lim.limit(motor_speed, [-1, 1])
+#    def set_rotator(self, motor_speed: float):
+#        self.rotator_speed = Lim.limit(motor_speed, [-1, 1])
+#
+#        self.sd.putValue("Boom WRotator Speed: ", self.rotator_speed)
 
-        self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
+    def set_rotator(self):
+        self.rotator_position = self.get_angle()
 
     def execute(self):
 

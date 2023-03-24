@@ -1,17 +1,16 @@
 from wpimath.controller import PIDController
 from magicbot import tunable
 from networktables import NetworkTables
-from components.boom import Boom
+
 from ctre import WPI_TalonFX
-from robotpy import d
+
 
 class Rotate_Controller:
 
-    boom_arm: Boom
-    boom_rotator_motor: WPI_TalonFX
+    motor: WPI_TalonFX
     
     rate = 0.5
-    kP = 0
+    kP = 0.2
     kI = 0
     kD = 0
     kF = 0
@@ -33,7 +32,7 @@ class Rotate_Controller:
         
     
     def get_angle(self):
-        self.boom_rotator_motor.getSelectedSensorPosition()
+        self.motor.getSelectedSensorPosition()
 
     def pid_Write_angle(self, rate):
         self.rate = rate
@@ -44,10 +43,10 @@ class Rotate_Controller:
     
     def execute(self):
         if self.setpoint == self.get_angle:
-            self.boom_rotator_motor.set(0)
+            self.motor.set(0)
             self.stop()
         else:
-            self.boom_rotator_motor.set(self.rate)
+            self.motor.set(self.rate)
             
     def stop(self):
         self.angle_controller.disable()

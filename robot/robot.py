@@ -59,6 +59,7 @@ class SpartaBot(MagicRobot):
     drivetrain: DriveTrain
     boom_arm: Boom
     grabber : Grabber
+    rotate_controller: Rotate_Controller
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -82,16 +83,13 @@ class SpartaBot(MagicRobot):
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = WPI_TalonFX(3)
+        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(NEUTRAL_MODE)
         self.talon_L_2.setNeutralMode(NEUTRAL_MODE)
         self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
         self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
-
-        self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        # self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -131,7 +129,6 @@ class SpartaBot(MagicRobot):
         rot_speed += self.drive_controller.getRightTriggerAxis()
         rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_rotator(0)
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed/5)
@@ -150,20 +147,23 @@ class SpartaBot(MagicRobot):
         self.boom_arm.set_extender(wind_speed)
 
         # grabber: A button to open/close (switches from one state to another)
-        if self.drive_controller.getAButtonReleased():
-            Grabber.turn_off_compressor()
+        #if self.drive_controller.getAButtonReleased():
+        #    Grabber.turn_off_compressor()
 
         if self.drive_controller.getBButtonReleased():
             self.grabber.toggle_compressor()
 
-        if self.drive_controller.getYButton():
-            aiming.side_to_side(self)
+        #if self.drive_controller.getYButton():
+        #    aiming.side_to_side(self)
 
         if self.drive_controller.getXButton():
             aiming.forward_backward(self)
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
+        
+        if self.drive_controller.getYButton():
+            self.boom_arm.set_rotator(0.5)
 
 
 if __name__ == '__main__':
