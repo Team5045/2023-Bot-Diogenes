@@ -25,5 +25,6 @@ class Grabber:
     def shift_gears(self):
         self.solenoid_gear.toggle()
 
+
     def execute(self):
         pass
