@@ -49,7 +49,8 @@ SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
 WINDING_SPEED = .5
-NEUTRAL_MODE = NeutralMode(2)
+BRAKE_MODE = NeutralMode(2)
+COAST_MODE = NeutralMode(1)
 
 class SpartaBot(MagicRobot):
 
@@ -84,10 +85,10 @@ class SpartaBot(MagicRobot):
         self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
         self.boom_rotator_spark = WPI_TalonFX(3)
 
-        self.talon_L_1.setNeutralMode(NEUTRAL_MODE)
-        self.talon_L_2.setNeutralMode(NEUTRAL_MODE)
-        self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
-        self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
+        self.talon_L_1.setNeutralMode(COAST_MODE)
+        self.talon_L_2.setNeutralMode(COAST_MODE)
+        self.talon_R_1.setNeutralMode(COAST_MODE)
+        self.talon_R_2.setNeutralMode(COAST_MODE)
 
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
@@ -159,6 +160,12 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
+        
+        if self.drive_controller.getLeftStickButtonReleased():
+            self.talon_L_1.setNeutralMode(BRAKE_MODE)
+            self.talon_L_2.setNeutralMode(BRAKE_MODE)
+            self.talon_R_1.setNeutralMode(BRAKE_MODE)
+            self.talon_R_2.setNeutralMode(BRAKE_MODE)
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)
