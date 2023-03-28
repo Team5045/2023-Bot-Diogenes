@@ -15,6 +15,7 @@ from robotpy_ext.autonomous import AutonomousModeSelector
 from components.LimeLight import aiming
 from ctre import NeutralMode
 from Controllers.Rotate_Controller import Rotate_Controller
+from wpimath.controller import PIDController
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -53,14 +54,17 @@ WINDING_SPEED = .5
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
 
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
 
     drivetrain: DriveTrain
     boom_arm: Boom
-    grabber : Grabber
+    grabber: Grabber
     rotate_controller: Rotate_Controller
+
+    angle_controller = PIDController(0, 0, 0, 0.2)
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -68,7 +72,8 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(
+            0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -76,15 +81,19 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
-        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(
+            0, PNEUMATICS_MODULE_TYPE)
 
-        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
-        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 0, 1)
 
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
+            4, MOTOR_BRUSHLESS)
         self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
@@ -130,7 +139,6 @@ class SpartaBot(MagicRobot):
         rot_speed += self.drive_controller.getRightTriggerAxis()
         rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed/5)
             print(rot_speed)
@@ -148,21 +156,18 @@ class SpartaBot(MagicRobot):
         self.boom_arm.set_extender(wind_speed)
 
         # grabber: A button to open/close (switches from one state to another)
-        #if self.drive_controller.getAButtonReleased():
-        #    Grabber.turn_off_compressor()
+        if self.drive_controller.getAButtonReleased():
+            Grabber.turn_off_compressor()
 
         if self.drive_controller.getBButtonReleased():
             self.grabber.toggle_compressor()
 
-        #if self.drive_controller.getYButton():
-        #    aiming.side_to_side(self)
-
-        if self.drive_controller.getXButton():
-            aiming.forward_backward(self)
+        if self.drive_controller.getYButtonReleased():
+            self.angle_controller.calculate()
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
-        
+
         if self.drive_controller.getLeftStickButtonReleased():
             self.talon_L_1.setNeutralMode(BRAKE_MODE)
             self.talon_L_2.setNeutralMode(BRAKE_MODE)
