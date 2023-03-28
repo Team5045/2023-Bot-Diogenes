@@ -90,6 +90,7 @@ class SpartaBot(MagicRobot):
         self.talon_R_1.setNeutralMode(COAST_MODE)
         self.talon_R_2.setNeutralMode(COAST_MODE)
 
+
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -112,8 +113,9 @@ class SpartaBot(MagicRobot):
         speed = self.drive_controller.getLeftY()
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            # NOTE: to make the front of the robot the tower, remove '-'
+
             self.drivetrain.set_motors(speed, -angle)
+
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -166,6 +168,7 @@ class SpartaBot(MagicRobot):
             self.talon_L_2.setNeutralMode(BRAKE_MODE)
             self.talon_R_1.setNeutralMode(BRAKE_MODE)
             self.talon_R_2.setNeutralMode(BRAKE_MODE)
+
 
 if __name__ == '__main__':
     wpilib.run(SpartaBot)

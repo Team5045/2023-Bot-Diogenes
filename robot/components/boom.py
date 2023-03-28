@@ -1,7 +1,9 @@
 from networktables import NetworkTable
 import rev
-from tools.utils import Lim
-from ctre import TalonFX
+
+from utils import limit
+from ctre import WPI_TalonFX
+
 
 
 STRING_LEN = 28.5  # (inches)
@@ -9,23 +11,18 @@ STRING_LEN = 28.5  # (inches)
 
 class Boom:
 
-    # get sparks from main robot via variable injection
-    boom_extender_spark: rev.CANSparkMax
-    boom_rotator_spark: TalonFX
+    boom_extender_motor: rev.CANSparkMax
+    boom_rotator_motor: WPI_TalonFX
 
     sd: NetworkTable
+
+    # get sparks from main robot via variable injection
 
     def setup(self):
         """instead of __init__(), use setup() to initialize values (works with magicrobot variable injection)"""
         self.extender_speed = 0
         self.rotator_speed = 0
 
-        # self.extender_hall_encoder = self.boom_extender_spark.getEncoder()
-        # self.extender_hall_encoder.setPosition(0)
-
-        # for now, there are not limits to how much you can wind the string (with extender)
-        #   in the future, add safety mechanism to ensure string is not overwound
-        # self.slack = STRING_LEN
 
     def set_extender(self, motor_speed: float):
         self.extender_speed = Lim.limit(motor_speed, [-1, 1])
@@ -39,5 +36,5 @@ class Boom:
 
     def execute(self):
 
-        self.boom_extender_spark.set(self.extender_speed)
-        self.boom_rotator_spark.set(self.rotator_speed)
+        self.boom_extender_motor.set(self.extender_speed)
+        self.boom_rotator_motor.set(self.rotator_speed)
