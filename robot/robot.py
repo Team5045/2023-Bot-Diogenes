@@ -13,6 +13,8 @@ import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
 from wpimath.controller import PIDController
 
+from tools.utils import Lim
+
 from components.LimeLight import aiming
 from ctre import NeutralMode
 
@@ -141,7 +143,7 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getYButton():
             # pass
-            self.drivetrain.set_motors(self.pidSpeed, 0)
+            self.drivetrain.set_motors(Lim.limit(self.pidSpeed, [-0.5, 0.5]), 0)
 
         elif (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
 
