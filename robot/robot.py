@@ -9,7 +9,7 @@ import navx
 from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
-from components.encoders import encoders
+# from components.encoders import encoders
 from components.gyro import gyro
 import wpilib.drive
 
@@ -59,6 +59,7 @@ class SpartaBot(MagicRobot):
     drivetrain: DriveTrain
     boom_arm: Boom
     grabber : Grabber
+    gyro: gyro
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -164,8 +165,9 @@ class SpartaBot(MagicRobot):
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
 
-        if self.drive_controller.getXButtonPressed():
-            gyro.balancing(self)
+        if self.drive_controller.getXButton():
+            self.gyro.balancing()
+            
 
 
 if __name__ == '__main__':

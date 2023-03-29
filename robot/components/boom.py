@@ -2,7 +2,7 @@ from networktables import NetworkTable
 import rev
 from tools.utils import Lim
 from ctre import TalonFX
-from components.encoders import encoders
+# from components.encoders import encoders
 
 
 STRING_LEN = 28.5  # (inches)
