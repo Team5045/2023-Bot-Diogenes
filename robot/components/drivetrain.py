@@ -45,7 +45,7 @@ class DriveTrain:
         angle: percentage of full rotation, ccw is positive
         Puts values into smartdashboard to be called by arcadeDrive() later in execute()
         """
-        self.speed = Lim.limit(speed, [-1, 1])
+        self.speed = Lim.limit(speed, [-0.7, 0.7])
         self.angle = Lim.limit(angle, [-1, 1])
 
         self.sd.putValue("Speed", self.speed)

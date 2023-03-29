@@ -11,6 +11,7 @@ from components.grabber import Grabber
 from components.encoders import encoders
 import wpilib.drive
 from robotpy_ext.autonomous import AutonomousModeSelector
+from wpimath.controller import PIDController
 
 from components.LimeLight import aiming
 from ctre import NeutralMode
@@ -60,7 +61,18 @@ class SpartaBot(MagicRobot):
     grabber : Grabber
 
     def createObjects(self):
-        '''Create motors and stuff here'''
+        """
+        IDs
+        0: Xbox Controller
+        0: Compressor
+        4: Talon Left 1
+        6: Talon Right 2
+        7: Talon Right 1
+        8: Talon Left 2
+
+
+
+        """
 
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
@@ -73,6 +85,13 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
+        # Drivetrain encoders
+        self.drivetrain_encoder_motor_right: rev.CANSparkMax = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        self.drivetrain_encoder_motor_left: rev.CANSparkMax = rev.CANSparkMax(2, MOTOR_BRUSHLESS)
+
+        self.drivetrain_encoder_right = self.drivetrain_encoder_motor_right.getEncoder()
+        self.drivetrain_encoder_left = self.drivetrain_encoder_motor_left.getEncoder()
+
         self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
 
         self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
@@ -81,13 +100,17 @@ class SpartaBot(MagicRobot):
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = WPI_TalonFX(3)
+        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(NEUTRAL_MODE)
         self.talon_L_2.setNeutralMode(NEUTRAL_MODE)
         self.talon_R_1.setNeutralMode(NEUTRAL_MODE)
         self.talon_R_2.setNeutralMode(NEUTRAL_MODE)
+
+        # PID
+        self.drivePID = PIDController(0.0006, 0.0012, 0, 0.02)
+        self.pidSpeed = 0
 
 
     def disabledPeriodic(self):
@@ -95,6 +118,10 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        self.drivetrain_encoder_left.setPosition(0)
+        self.drivetrain_encoder_right.setPosition(0)
+        self.drivePID.reset()
+
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")
@@ -106,21 +133,31 @@ class SpartaBot(MagicRobot):
         NOTE: all components' execute() methods will be called automatically
         '''
 
+        self.pidSpeed = -self.drivePID.calculate(self.drivetrain_encoder_right.getPosition(), 0)
+
         # drive controls
-        # print("tele")
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
-        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+        if self.drive_controller.getYButton():
+            # pass
+            self.drivetrain.set_motors(self.pidSpeed, 0)
+
+        elif (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
 
             self.drivetrain.set_motors(speed, -angle)
 
             self.sd.putValue('Drivetrain: ', 'moving')
+            # Put encoder values in smartdashboard
+            self.sd.putValue('Drivetrain Encoder Right: ', self.drivetrain_encoder_right.getPosition())
+            self.sd.putValue('Drivetrain Encoder Left: ', self.drivetrain_encoder_left.getPosition())
 
         else:
             # reset value to make robot stop moving
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
+
+        # print(self.drivetrain.speed)
 
         # boom rotation: left/right triggers
         rot_speed = 0
@@ -151,13 +188,23 @@ class SpartaBot(MagicRobot):
             self.grabber.solenoid_toggle()
 
         if self.drive_controller.getBButtonReleased():
-            self.grabber.toggle_compressor(self)
+            self.grabber.toggle_compressor()
 
         if self.drive_controller.getYButton():
-            aiming.side_to_side(self)
+            print(f"drivetrain speed: {self.drivetrain.speed}")
+            # print(-self.drivePID.calculate(self.drivetrain_encoder_right.getPosition(), 0))
 
-        if self.drive_controller.getXButton():
-            aiming.forward_backward(self)
+        # if self.drive_controller.getYButton():
+        #     aiming.side_to_side(self)
+        #
+        # if self.drive_controller.getXButton():
+        #     aiming.forward_backward(self)
+
+
+
+
+        self.sd.putValue('PID: ', self.pidSpeed)
+
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()

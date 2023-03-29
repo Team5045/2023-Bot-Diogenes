@@ -1,7 +1,9 @@
 from networktables import NetworkTable
 import rev
 
-from utils import limit
+
+
+from tools.utils import Lim
 from ctre import WPI_TalonFX
 
 
