@@ -10,7 +10,7 @@ from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
 # from components.encoders import encoders
-from components.gyro import gyro
+from components.gyro import Gyro
 import wpilib.drive
 
 from components.LimeLight import aiming
@@ -59,7 +59,7 @@ class SpartaBot(MagicRobot):
     drivetrain: DriveTrain
     boom_arm: Boom
     grabber : Grabber
-    gyro: gyro
+    gyro: Gyro
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -167,6 +167,8 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getXButton():
             self.gyro.balancing()
+        if self.drive_controller.getStartButtonReleased():
+            self.gyro.reset()
             
 
 
