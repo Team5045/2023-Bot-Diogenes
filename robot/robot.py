@@ -181,6 +181,10 @@ class SpartaBot(MagicRobot):
             self.gyro.balancing()
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
+
+        if self.drive_controller.getBackButtonReleased():
+            self.encoder.getValues()
+            
             
 
 
