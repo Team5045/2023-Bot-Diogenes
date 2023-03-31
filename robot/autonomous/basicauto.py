@@ -4,6 +4,7 @@ from components.drivetrain import DriveTrain
 from components.grabber import Grabber
 from components.boom import Boom
 from magicbot import magicrobot
+from components.gyro import Gyro
 
 from magicbot import AutonomousStateMachine, tunable, state, timed_state
 import networktables
@@ -17,6 +18,7 @@ class autoCharge(AutonomousStateMachine):
     drivetrain: DriveTrain
     boom_arm: Boom
     grabber: Grabber
+    gyro: Gyro
 
     
     @timed_state(duration = 3.75, next_state = "pause1",  first = True)
