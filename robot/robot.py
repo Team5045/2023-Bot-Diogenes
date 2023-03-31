@@ -9,6 +9,7 @@ import navx
 from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
+from components.encoders import Encoder
 # from components.encoders import encoders
 from components.gyro import Gyro
 import wpilib.drive
@@ -61,6 +62,7 @@ class SpartaBot(MagicRobot):
     boom_arm: Boom
     grabber : Grabber
     gyro: Gyro
+    encoder: Encoder
 
     def createObjects(self):
         '''Create motors and stuff here'''

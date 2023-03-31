@@ -63,6 +63,7 @@ class Gyro():
         print("STATE: RESETTING NAVX")
     
     def execute(self):
+        # just passes through this to execute gyro in robot.py
         pass
             
 
