@@ -1,10 +1,7 @@
 # time for a pro gyro no lie
 import navx
 from components.drivetrain import DriveTrain
-import wpilib
-import ctre
 import networktables
-from networktables import NetworkTable
 from magicbot import MagicRobot
 # Various imports
 
