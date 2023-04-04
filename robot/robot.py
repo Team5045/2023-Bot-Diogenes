@@ -8,7 +8,7 @@ import navx
 
 from components.drivetrain import DriveTrain
 from components.boom import Boom
-from components.grabber import Grabber
+# from components.grabber import Grabber
 from components.encoders import Encoder
 # from components.encoders import encoders
 from components.gyro import Gyro
@@ -60,7 +60,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
-    grabber : Grabber
+    # grabber : Grabber
     gyro: Gyro
     encoder: Encoder
 
@@ -157,11 +157,11 @@ class SpartaBot(MagicRobot):
         self.boom_arm.set_extender(wind_speed)
 
         # grabber: A button to open/close (switches from one state to another)
-        if self.drive_controller.getAButtonReleased():
-            self.grabber.solenoid_toggle()
+        # if self.drive_controller.getAButtonReleased():
+        #     self.grabber.solenoid_toggle()
 
-        if self.drive_controller.getBButtonReleased():
-            self.grabber.toggle_compressor(self)
+        # if self.drive_controller.getBButtonReleased():
+        #     self.grabber.toggle_compressor(self)
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
