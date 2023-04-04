@@ -7,7 +7,7 @@ from wpilib import DoubleSolenoid
 import navx
 
 from components.drivetrain import DriveTrain
-from components.boom import Boom
+# from components.boom import Boom
 # from components.grabber import Grabber
 from components.encoders import Encoder
 # from components.encoders import encoders
@@ -59,8 +59,9 @@ class SpartaBot(MagicRobot):
     # a DriveTrain instance is automatically created by MagicRobot
 
     drivetrain: DriveTrain
-    boom_arm: Boom
+    # boom_arm: Boom
     # grabber : Grabber
+    '''We don't have an arm or grabber atm! :DDD'''
     gyro: Gyro
     encoder: Encoder
 
@@ -132,29 +133,31 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
+
+        '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        rot_speed = 0
+        # rot_speed = 0
 
-        rot_speed += self.drive_controller.getRightTriggerAxis()
-        rot_speed -= self.drive_controller.getLeftTriggerAxis()
+        # rot_speed += self.drive_controller.getRightTriggerAxis()
+        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_rotator(0)
+        # self.boom_arm.set_rotator(0)
 
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed/5)
-            print(rot_speed)
+        # if (abs(rot_speed) > INPUT_SENSITIVITY):
+        #     self.boom_arm.set_rotator(rot_speed/5)
+        #     print(rot_speed)
 
-        # boom extension: bumpers
-        # NOTE: it is assumed that the boom arm is fully retracted
-        wind_speed = 0
+        # # boom extension: bumpers
+        # # NOTE: it is assumed that the boom arm is fully retracted
+        # wind_speed = 0
 
-        if (self.drive_controller.getRightBumper()):
-            wind_speed -= WINDING_SPEED
+        # if (self.drive_controller.getRightBumper()):
+        #     wind_speed -= WINDING_SPEED
 
-        if (self.drive_controller.getLeftBumper()):
-            wind_speed += WINDING_SPEED
+        # if (self.drive_controller.getLeftBumper()):
+        #     wind_speed += WINDING_SPEED
 
-        self.boom_arm.set_extender(wind_speed)
+        # self.boom_arm.set_extender(wind_speed)
 
         # grabber: A button to open/close (switches from one state to another)
         # if self.drive_controller.getAButtonReleased():
