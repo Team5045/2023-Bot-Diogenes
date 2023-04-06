@@ -21,35 +21,35 @@ class Autonomous(AutonomousStateMachine):
     grabber: Grabber
     gyro: Gyro
 
-    @timed_state(duration = 0.75, next_state = "grabit", first = True)
-    def start(self):
-        self.boom_arm.set_rotator(-0.2)
-        self.sd.putValue("Mode: ", "Initial Raise")
+    # @timed_state(duration = 0.75, next_state = "grabit", first = True)
+    # def start(self):
+    #     self.boom_arm.set_rotator(-0.2)
+    #     self.sd.putValue("Mode: ", "Initial Raise")
     
-    @state(next_state = "pause1")
-    def grabit(self):
-        self.boom_arm.set_rotator(0.0)
-        self.grabber.solenoid_toggle()
+    # @state(next_state = "pause1")
+    # def grabit(self):
+    #     self.boom_arm.set_rotator(0.0)
+    #     self.grabber.solenoid_toggle()
     
-    @timed_state(duration = 1, next_state = "Rotate")
-    def pause1(self):
-        self.boom_arm.set_rotator(0)
+    # @timed_state(duration = 1, next_state = "Rotate")
+    # def pause1(self):
+    #     self.boom_arm.set_rotator(0)
     
-    @timed_state(duration = 2.25, next_state = "Drop")
-    def ExtendArm(self):
-        self.boom_arm.set_rotator(-0.2)
-        self.sd.putValue("Mode: ", "Extending Arm")
+    # @timed_state(duration = 2.25, next_state = "Drop")
+    # def ExtendArm(self):
+    #     self.boom_arm.set_rotator(-0.2)
+    #     self.sd.putValue("Mode: ", "Extending Arm")
     
-    @state(next_state = "Retract")
-    def Drop(self):
-        self.boom_arm.set_rotator(0.0) 
-        self.grabber.solenoid_toggle()
-        self.sd.putValue("Mode: ", "Dropping")
+    # @state(next_state = "Retract")
+    # def Drop(self):
+    #     self.boom_arm.set_rotator(0.0) 
+    #     self.grabber.solenoid_toggle()
+    #     self.sd.putValue("Mode: ", "Dropping")
 
-    @timed_state(duration = 3, next_state = "Moveback")
-    def retract(self):
-        self.boom_arm.set_rotator(0.2)
-        self.sd.putValue("Mode: ", "Retracting all previous actions")
+    # @timed_state(duration = 3, next_state = "Moveback")
+    # def retract(self):
+    #     self.boom_arm.set_rotator(0.2)
+    #     self.sd.putValue("Mode: ", "Retracting all previous actions")
 
     # @timed_state(duration = 3, next_state = "Done")
     # def Moveback(self):
@@ -59,27 +59,27 @@ class Autonomous(AutonomousStateMachine):
     #     self.sd.putValue("Mode: ", "Taxi for Points")
     '''^^^^^^^^^^^^^^^^^^^ THIS IS OPTION ONE WITHOUT GYRO AS IN NO CHARGEPAD ^^^^^^^^^^^^'''
 
-    @timed_state(duration = 2, next_state = "balance")
-    def Moveback(self):
-        self.boom_arm.set_rotator(0.0)
-        self.drivetrain.set_motors(-0.5, 0.0)
-        self.sd.putValue("Mode: ", "Moving Back")
+    # @timed_state(duration = 2, next_state = "balance")
+    # def Moveback(self):
+    #     self.boom_arm.set_rotator(0.0)
+    #     self.drivetrain.set_motors(-0.5, 0.0)
+    #     self.sd.putValue("Mode: ", "Moving Back")
 
-    @timed_state(duration = 6, next_state = "done")
-    def balance(self):
-        self.navx = navx.AHRS.create_spi()
-        if (self.navx.getRoll > 5) and (self.navx.getRoll < -5):
-            self.gyro.balancing()
-            self.sd.putValue("AUTON: ", "GYRO ENABLED")
-        # Does the gyro thing in auton yay
-        else:
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue("AUTON: ", "GYRO NOT DETECTING")
+    # @timed_state(duration = 6, next_state = "done")
+    # def balance(self):
+    #     self.navx = navx.AHRS.create_spi()
+    #     if (self.navx.getRoll > 5) and (self.navx.getRoll < -5):
+    #         self.gyro.balancing()
+    #         self.sd.putValue("AUTON: ", "GYRO ENABLED")
+    #     # Does the gyro thing in auton yay
+    #     else:
+    #         self.drivetrain.set_motors(0.0, 0.0)
+    #         self.sd.putValue("AUTON: ", "GYRO NOT DETECTING")
 
-    @state
-    def Done(self):
-        self.drivetrain.set_motors(0.0, 0.0)
-        self.sd.putValue("Mode: ", "Completed!")
+    # @state
+    # def Done(self):
+    #     self.drivetrain.set_motors(0.0, 0.0)
+    #     self.sd.putValue("Mode: ", "Completed!")
         
    
     ''' IN THE ASSUMPTION THAT WE DO NOT HAVE A WORKING ARM...'''
