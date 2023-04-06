@@ -9,7 +9,7 @@ from magicbot import magicrobot
 from magicbot import AutonomousStateMachine, tunable, state, timed_state
 import networktables
 import wpilib
-
+import navx
 
 
 class autoCharge(AutonomousStateMachine):
@@ -63,3 +63,51 @@ class autoCharge(AutonomousStateMachine):
         self.sd.putValue("Mode: ", "Completed!")
 
 
+class Cone_Charge(AutonomousStateMachine):
+    DEFAULT = True
+    MODE_NAME = "autodrive"
+    sd: networktables.NetworkTable
+    drivetrain: DriveTrain
+    boom_arm: Boom
+    grabber: Grabber
+    gyro: Gyro
+
+    @state(first = True, next_state = "clamp")
+    def start(self):
+        self.navx = navx.AHRS.create_spi()
+        self.gyro.reset()
+        self.boom_arm
+    
+    @state(next_state = "rotate_back")
+    def clamp(self):
+        self.grabber.solenoid_toggle()
+    
+    @state(next_state = "drop")
+    def rotate_arm(self):
+        self.boom_arm.boom_rotator_motor
+    
+    @state(next_state = "retract")
+    def drop(self):
+        self.grabber.solenoid_toggle()
+
+    @state(next_state = "rotate_arm_back")
+    def retract(self):
+    
+    @state(next_state = "move_forward")
+    def rotate_arm_back(self):
+
+    @state(next_state = "balance")
+    def move_forward(self):
+    
+    @state(next_state = "Done")
+    def balance(self):
+    
+    @state
+    def Done(self):
+        self.drivetrain.set_motors(0, 0)
+        self.boom_arm.set_extender(0)
+        self.boom_arm.set_rotator(0)
+        self.sd.putValue("Mode: ", "Completed!")
+
+
+        
