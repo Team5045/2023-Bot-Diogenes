@@ -7,8 +7,8 @@ from wpilib import DoubleSolenoid
 import navx
 
 from components.drivetrain import DriveTrain
-# from components.boom import Boom
-# from components.grabber import Grabber
+from components.boom import Boom
+from components.grabber import Grabber
 from components.encoders import Encoder
 # from components.encoders import encoders
 from components.gyro import Gyro

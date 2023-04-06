@@ -1,8 +1,8 @@
 # This is the Magnolia regional Temporary unfinished autonomous
 # Without any gyroscope abilities or anything. 
 from components.drivetrain import DriveTrain
-# from components.grabber import Grabber
-# from components.boom import Boom
+from components.grabber import Grabber
+from components.boom import Boom
 from magicbot import magicrobot
 from components.gyro import Gyro
 
@@ -17,8 +17,8 @@ class Autonomous(AutonomousStateMachine):
     MODE_NAME = "autodrive"
     sd: networktables.NetworkTable
     drivetrain: DriveTrain
-    # boom_arm: Boom
-    # grabber: Grabber
+    boom_arm: Boom
+    grabber: Grabber
     gyro: Gyro
 
     
