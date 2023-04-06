@@ -137,41 +137,41 @@ class SpartaBot(MagicRobot):
             self.sd.putValue('Drivetrain: ', 'static')
 
         # boom rotation: left/right triggers
-        rot_speed = 0
-
-        rot_speed += self.drive_controller.getRightTriggerAxis()
-        rot_speed -= self.drive_controller.getLeftTriggerAxis()
-
-        self.boom_arm.set_rotator(0)
-
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed/5)
+        # rot_speed = 0
+        #
+        # rot_speed += self.drive_controller.getRightTriggerAxis()
+        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
+        #
+        # self.boom_arm.set_rotator(0)
+        #
+        # if (abs(rot_speed) > INPUT_SENSITIVITY):
+        #     self.boom_arm.set_rotator(rot_speed/5)
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
-        wind_speed = 0
-
-        if (self.drive_controller.getRightBumper()):
-            wind_speed -= WINDING_SPEED
-
-        if (self.drive_controller.getLeftBumper()):
-            wind_speed += WINDING_SPEED
-
-        self.boom_arm.set_extender(wind_speed/5, self.boom_extender_motor)
+        # wind_speed = 0
+        #
+        # if (self.drive_controller.getRightBumper()):
+        #     wind_speed -= WINDING_SPEED
+        #
+        # if (self.drive_controller.getLeftBumper()):
+        #     wind_speed += WINDING_SPEED
+        #
+        # self.boom_arm.set_extender(wind_speed/5, self.boom_extender_motor)
 
         # grabber: A button to open/close (switches from one state to another)
-        if self.drive_controller.getAButtonReleased():
-            self.grabber.solenoid_toggle()
+        # if self.drive_controller.getAButtonReleased():
+        #     self.grabber.solenoid_toggle()
 
-        if self.drive_controller.getBButtonReleased():
-            self.grabber.toggle_compressor()
+        # if self.drive_controller.getBButtonReleased():
+        #     self.grabber.toggle_compressor()
 
-        if self.drive_controller.getYButton():
-            aiming.side_to_side(self)
-            aiming.forward_backward(self)
+        # if self.drive_controller.getYButton():
+        #     aiming.side_to_side(self)
+        #     aiming.forward_backward(self)
 
-        if self.drive_controller.getRightStickButtonReleased():
-            self.solenoid_gear.toggle()
+        # if self.drive_controller.getRightStickButtonReleased():
+        #     self.solenoid_gear.toggle()
 
         if self.drive_controller.getLeftStickButtonReleased():
             self.talon_L_1.setNeutralMode(BRAKE_MODE)
