@@ -1,7 +1,8 @@
-from networktables import NetworkTable
 import rev
-from robot.tools.utils import Lim
 from ctre import WPI_TalonFX
+from networktables import NetworkTable
+from tools.utils import Lim
+
 # from components.encoders import encoders
 
 
