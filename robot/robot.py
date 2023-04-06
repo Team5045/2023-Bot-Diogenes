@@ -108,6 +108,7 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        self.boom_extender_spark.getEncoder().setPosition(0)
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")
@@ -156,7 +157,7 @@ class SpartaBot(MagicRobot):
         if (self.drive_controller.getLeftBumper()):
             wind_speed += WINDING_SPEED
 
-        self.boom_arm.set_extender(wind_speed/5)
+        self.boom_arm.set_extender(wind_speed/5, self.boom_extender_spark)
 
         # grabber: A button to open/close (switches from one state to another)
         if self.drive_controller.getAButtonReleased():
