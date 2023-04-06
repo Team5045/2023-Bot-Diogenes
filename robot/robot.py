@@ -133,7 +133,6 @@ class SpartaBot(MagicRobot):
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed/5)
-            print(rot_speed)
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
@@ -145,14 +144,14 @@ class SpartaBot(MagicRobot):
         if (self.drive_controller.getLeftBumper()):
             wind_speed += WINDING_SPEED
 
-        self.boom_arm.set_extender(wind_speed)
+        self.boom_arm.set_extender(wind_speed/5)
 
         # grabber: A button to open/close (switches from one state to another)
         if self.drive_controller.getAButtonReleased():
             self.grabber.solenoid_toggle()
 
         if self.drive_controller.getBButtonReleased():
-            self.grabber.toggle_compressor(self)
+            self.grabber.toggle_compressor()
 
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
