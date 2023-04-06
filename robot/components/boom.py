@@ -5,12 +5,9 @@ from tools.utils import Lim
 
 # from components.encoders import encoders
 
-
-
 STRING_LEN = 28.5  # (inches)
 CHAIN_LEN = 200 # (encoder ticks)
 BUFFER_DISTANCE = 20 # (encoder ticks)
-
 
 class Boom:
 

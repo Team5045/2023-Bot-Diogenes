@@ -63,9 +63,11 @@ class Gyro():
 
     def reset(self):
         self.navx.reset()
+        self.sd.putValue("MODE: ", "navx_reset")
         print("STATE: RESETTING NAVX")
     
     def execute(self):
+        # just passes through this to execute gyro in robot.py
         pass
             
 

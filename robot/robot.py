@@ -9,7 +9,7 @@ import navx
 from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
-# from components.encoders import encoders
+from components.encoders import Encoder
 from components.gyro import Gyro
 import wpilib.drive
 
@@ -62,6 +62,7 @@ class SpartaBot(MagicRobot):
     boom_arm: Boom
     grabber: Grabber
     gyro: Gyro
+    encoder: Encoder
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -103,6 +104,11 @@ class SpartaBot(MagicRobot):
     def disabledInit(self) -> None:
         self.navx.reset()
 
+        self.navx = navx.AHRS.create_spi()
+
+    def disabledInit(self) -> None:
+        self.navx.reset()
+    
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -136,6 +142,8 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
+
+        '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
         # rot_speed = 0
         #
@@ -184,6 +192,17 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
+
+
+        if self.drive_controller.getXButton():
+            self.gyro.balancing()
+        if self.drive_controller.getStartButtonReleased():
+            self.gyro.reset()
+
+        if self.drive_controller.getBackButtonReleased():
+            self.encoder.getValues()
+            
+            
 
 
 if __name__ == '__main__':

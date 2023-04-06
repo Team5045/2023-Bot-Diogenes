@@ -1,30 +1,29 @@
 import wpilib
-from ctre import TalonSRX
-import networktables
-from networktables import NetworkTable
 from ctre import TalonFX
+from magicbot import MagicRobot
 
-LeftEncoder = TalonSRX(0)
-RightEncoder = TalonSRX(1)
-ArmEnc = TalonFX(3)
-
-class encoders():
-    # sd: networktables
-    # Left encoder values getting from here
-    def left(self):
-        self.senseleft = LeftEncoder.getSensorCollection()
-        print(self.senseleft.getQuadratureVelocity())
+class Encoder():
     
-    # Right encoder values getting from here
-    def right(self):
-        self.senseright = RightEncoder.getSensorCollection()
-        print(self.senseright.getQuadratureVelocity())
-
-class FalconEncoder():
+    def setup(self):
+        Talon_RE = TalonFX(2)
+        Talon_LE = TalonFX(1)
+        self.encoderR = Talon_RE
+        self.encoderL = Talon_LE
     
-    def getpos(self):
-        self.position = ArmEnc.getSensorCollection()
-        pos = self.position.getIntegratedSensorPosition()
+    def getValues(self):
+        # Getting information from the right gearbox TalonFX
+        PositionRight = self.encoderR.getSelectedSensorPosition()
+        VelocityRight = self.encoderR.getSelectedSensorVelocity()
+        print(f'POSITION(right): {PositionRight}')
+        print(f'VELOCITY(right): {VelocityRight}')
+
+        # Getting information from the left gearbox TalonFX
+        PositionLeft = self.encoderL.getSelectedSensorPosition() 
+        VelocityLeft = self.encoderL.getSelectedSensorVelocity()
+        print(f'POSITION(left): {PositionLeft}')
+        print(f'VELOCITY(left): {VelocityLeft}')
         
+    def execute(self):
+        pass
 
-
+        
