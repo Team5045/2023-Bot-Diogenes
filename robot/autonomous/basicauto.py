@@ -71,7 +71,7 @@ class Autonomous(AutonomousStateMachine):
     #     self.drivetrain.set_motors(0.6, 0.0)
     #     self.sd.putValue("AUTON: ", "MOVING...")
 
-    # Alternative for Chargepad
+    # Alternative for Chargepad, I suggest using this.
     @timed_state(duration = 1.75, next_state = "Balancing", first = True)
     def begin(self):
         self.drivetrain.set_motors(0.6, 0.0)
@@ -87,6 +87,7 @@ class Autonomous(AutonomousStateMachine):
         else:
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue("AUTON: ", "GYRO NOT DETECTING")
+
         self.next_state = "COMPLETE"
     
     @state
