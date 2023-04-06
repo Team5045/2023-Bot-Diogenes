@@ -1,8 +1,8 @@
 from networktables import NetworkTable
 import rev
-
-from utils import limit
-from ctre import WPI_TalonFX
+from tools.utils import Lim
+from ctre import TalonFX
+# from components.encoders import encoders
 
 
 
@@ -35,6 +35,6 @@ class Boom:
         self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
 
     def execute(self):
-
-        self.boom_extender_motor.set(self.extender_speed)
-        self.boom_rotator_motor.set(self.rotator_speed)
+        self.boom_extender_spark.set(self.extender_speed)
+        self.boom_rotator_spark.set(self.rotator_speed)
+        

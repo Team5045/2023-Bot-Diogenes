@@ -19,7 +19,7 @@ class autoCharge(AutonomousStateMachine):
     grabber: Grabber
 
     
-    @timed_state(duration = 3, next_state = "pause1",  first = True)
+    @timed_state(duration = 3.75, next_state = "pause1",  first = True)
     def RaiseArm(self):
         self.boom_arm.set_rotator(-0.2)
         self.sd.putValue("Mode: ", "Raising Arm")
