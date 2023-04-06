@@ -1,20 +1,18 @@
-import wpilib
+import navx
 import rev
+import wpilib
+import wpilib.drive
+from ctre import NeutralMode
 from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
-import navx
 
-from components.drivetrain import DriveTrain
 from components.boom import Boom
-from components.grabber import Grabber
+from components.drivetrain import DriveTrain
 from components.encoders import Encoder
+from components.grabber import Grabber
 from components.gyro import Gyro
-import wpilib.drive
-
-from components.LimeLight import aiming
-from ctre import NeutralMode
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -49,7 +47,7 @@ MagicRobot.control_loop_wait_time = 0.05
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
-WINDING_SPEED = .5
+WINDING_SPEED = .2
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
 
@@ -92,6 +90,7 @@ class SpartaBot(MagicRobot):
 
         self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
             4, MOTOR_BRUSHLESS)
+        self.boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder = self.boom_extender_motor.getEncoder()
         self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
@@ -114,7 +113,8 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
-        self.boom_extender_motor.getEncoder().setPosition(0)
+        self.boom_extender_motor_encoder.setPosition(0)
+        self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")
@@ -142,37 +142,36 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
-
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        # rot_speed = 0
-        #
-        # rot_speed += self.drive_controller.getRightTriggerAxis()
-        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
-        #
-        # self.boom_arm.set_rotator(0)
-        #
-        # if (abs(rot_speed) > INPUT_SENSITIVITY):
-        #     self.boom_arm.set_rotator(rot_speed/5)
+        rot_speed = 0
+
+        rot_speed += self.drive_controller.getRightTriggerAxis()
+        rot_speed -= self.drive_controller.getLeftTriggerAxis()
+
+        self.boom_arm.set_rotator(0)
+
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_arm.set_rotator(rot_speed / 5)
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
-        # wind_speed = 0
-        #
-        # if (self.drive_controller.getRightBumper()):
-        #     wind_speed -= WINDING_SPEED
-        #
-        # if (self.drive_controller.getLeftBumper()):
-        #     wind_speed += WINDING_SPEED
-        #
-        # self.boom_arm.set_extender(wind_speed/5, self.boom_extender_motor)
+        wind_speed = 0
+
+        if (self.drive_controller.getRightBumper()):
+            wind_speed -= WINDING_SPEED
+
+        if (self.drive_controller.getLeftBumper()):
+            wind_speed += WINDING_SPEED
+
+        self.boom_arm.set_extender(wind_speed, self.boom_extender_motor_encoder)
 
         # grabber: A button to open/close (switches from one state to another)
         # if self.drive_controller.getAButtonReleased():
         #     self.grabber.solenoid_toggle()
 
-        # if self.drive_controller.getBButtonReleased():
-        #     self.grabber.toggle_compressor()
+        if self.drive_controller.getBButtonReleased():
+            self.grabber.toggle_compressor()
 
         # if self.drive_controller.getYButton():
         #     aiming.side_to_side(self)
