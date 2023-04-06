@@ -1,5 +1,7 @@
 # This is the Magnolia regional Temporary unfinished autonomous
 # Without any gyroscope abilities or anything. 
+import networktables
+from components.boom import Boom
 from components.drivetrain import DriveTrain
 from components.grabber import Grabber
 from components.boom import Boom
@@ -10,6 +12,7 @@ from magicbot import AutonomousStateMachine, tunable, state, timed_state
 import networktables
 import wpilib
 import navx
+
 
 
 class Autonomous(AutonomousStateMachine):
@@ -114,5 +117,16 @@ class Autonomous(AutonomousStateMachine):
     # def COMPLETE(self):
     #     self.drivetrain.set_motors(0.0, 0.0)
     #     self.sd.putValue("AUTON: ", "DONE")
+    
+    
+    @timed_state(duration=1, next_state="Done", first=True)
+    def Moveback(self):
+        self.boom_arm.set_extender(0.0)
+        self.boom_arm.set_rotator(0.0)
+        self.drivetrain.set_motors(-0.5, 0.0)
+        self.sd.putValue("Mode: ", "Taxi for Points")
 
-
+    @state
+    def Done(self):
+        self.drivetrain.set_motors(0.0, 0.0)
+        self.sd.putValue("Mode: ", "Completed!")

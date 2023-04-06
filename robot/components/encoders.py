@@ -22,10 +22,8 @@ class Encoder():
         VelocityLeft = self.encoderL.getSelectedSensorVelocity()
         print(f'POSITION(left): {PositionLeft}')
         print(f'VELOCITY(left): {VelocityLeft}')
-
+        
     def execute(self):
         pass
-    
-
 
         

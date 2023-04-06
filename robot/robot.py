@@ -10,7 +10,6 @@ from components.drivetrain import DriveTrain
 from components.boom import Boom
 from components.grabber import Grabber
 from components.encoders import Encoder
-# from components.encoders import encoders
 from components.gyro import Gyro
 import wpilib.drive
 
@@ -54,14 +53,14 @@ WINDING_SPEED = .5
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
 
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
 
     drivetrain: DriveTrain
-    # boom_arm: Boom
-    # grabber : Grabber
-    '''We don't have an arm or grabber atm! :DDD'''
+    boom_arm: Boom
+    grabber: Grabber
     gyro: Gyro
     encoder: Encoder
 
@@ -71,7 +70,8 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(
+            0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -79,22 +79,30 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
-        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(
+            0, PNEUMATICS_MODULE_TYPE)
 
-        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
-        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 0, 1)
 
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = WPI_TalonFX(3)
+        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
+            4, MOTOR_BRUSHLESS)
+        self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
         self.talon_R_1.setNeutralMode(COAST_MODE)
         self.talon_R_2.setNeutralMode(COAST_MODE)
 
+        self.navx = navx.AHRS.create_spi()
+
+    def disabledInit(self) -> None:
+        self.navx.reset()
 
         self.navx = navx.AHRS.create_spi()
 
@@ -106,6 +114,7 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
+        self.boom_extender_motor.getEncoder().setPosition(0)
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")
@@ -137,47 +146,52 @@ class SpartaBot(MagicRobot):
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
         # rot_speed = 0
-
+        #
         # rot_speed += self.drive_controller.getRightTriggerAxis()
         # rot_speed -= self.drive_controller.getLeftTriggerAxis()
-
+        #
         # self.boom_arm.set_rotator(0)
-
+        #
         # if (abs(rot_speed) > INPUT_SENSITIVITY):
         #     self.boom_arm.set_rotator(rot_speed/5)
-        #     print(rot_speed)
 
-        # # boom extension: bumpers
-        # # NOTE: it is assumed that the boom arm is fully retracted
+        # boom extension: bumpers
+        # NOTE: it is assumed that the boom arm is fully retracted
         # wind_speed = 0
-
+        #
         # if (self.drive_controller.getRightBumper()):
         #     wind_speed -= WINDING_SPEED
-
+        #
         # if (self.drive_controller.getLeftBumper()):
         #     wind_speed += WINDING_SPEED
-
-        # self.boom_arm.set_extender(wind_speed)
+        #
+        # self.boom_arm.set_extender(wind_speed/5, self.boom_extender_motor)
 
         # grabber: A button to open/close (switches from one state to another)
         # if self.drive_controller.getAButtonReleased():
         #     self.grabber.solenoid_toggle()
 
         # if self.drive_controller.getBButtonReleased():
-        #     self.grabber.toggle_compressor(self)
+        #     self.grabber.toggle_compressor()
 
-        if self.drive_controller.getYButton():
-            aiming.side_to_side(self)
-            aiming.forward_backward(self)
+        # if self.drive_controller.getYButton():
+        #     aiming.side_to_side(self)
+        #     aiming.forward_backward(self)
 
-        if self.drive_controller.getRightStickButtonReleased():
-            self.solenoid_gear.toggle()
-        
+        # if self.drive_controller.getRightStickButtonReleased():
+        #     self.solenoid_gear.toggle()
+
         if self.drive_controller.getLeftStickButtonReleased():
             self.talon_L_1.setNeutralMode(BRAKE_MODE)
             self.talon_L_2.setNeutralMode(BRAKE_MODE)
             self.talon_R_1.setNeutralMode(BRAKE_MODE)
             self.talon_R_2.setNeutralMode(BRAKE_MODE)
+
+        if self.drive_controller.getXButton():
+            self.gyro.balancing()
+
+        if self.drive_controller.getStartButtonReleased():
+            self.gyro.reset()
 
 
         if self.drive_controller.getXButton():
