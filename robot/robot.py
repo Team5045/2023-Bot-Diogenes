@@ -89,9 +89,9 @@ class SpartaBot(MagicRobot):
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(
+        self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
             4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = WPI_TalonFX(3)
+        self.boom_rotator_motor = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
@@ -108,7 +108,7 @@ class SpartaBot(MagicRobot):
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
-        self.boom_extender_spark.getEncoder().setPosition(0)
+        self.boom_extender_motor.getEncoder().setPosition(0)
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")
@@ -157,7 +157,7 @@ class SpartaBot(MagicRobot):
         if (self.drive_controller.getLeftBumper()):
             wind_speed += WINDING_SPEED
 
-        self.boom_arm.set_extender(wind_speed/5, self.boom_extender_spark)
+        self.boom_arm.set_extender(wind_speed/5, self.boom_extender_motor)
 
         # grabber: A button to open/close (switches from one state to another)
         if self.drive_controller.getAButtonReleased():
