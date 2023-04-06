@@ -60,3 +60,10 @@ class aiming:
                 self.sd.putValue("Limelight FB", "perfect!")
         except Exception as e:
             print(str(e))
+
+
+# ideas for Allen
+# Add object detection for some epic limelight business
+# Add variable speeds for some more smooth adjustments
+
+
