@@ -76,7 +76,7 @@ class Cone_Charge(AutonomousStateMachine):
     def start(self):
         self.navx = navx.AHRS.create_spi()
         self.gyro.reset()
-        self.boom_arm
+        self.boom_arm.boom_extender_motor.getEncoder().setPosition(0)
     
     @state(next_state = "rotate_back")
     def clamp(self):
