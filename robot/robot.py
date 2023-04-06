@@ -53,13 +53,14 @@ WINDING_SPEED = .5
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
 
+
 class SpartaBot(MagicRobot):
 
     # a DriveTrain instance is automatically created by MagicRobot
 
     drivetrain: DriveTrain
     boom_arm: Boom
-    grabber : Grabber
+    grabber: Grabber
     gyro: Gyro
 
     def createObjects(self):
@@ -68,7 +69,8 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(
+            0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -76,15 +78,19 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
-        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(
+            0, PNEUMATICS_MODULE_TYPE)
 
-        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
-        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
+            PNEUMATICS_MODULE_TYPE, 0, 1)
 
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
         self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(
+            4, MOTOR_BRUSHLESS)
         self.boom_rotator_spark = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
@@ -92,12 +98,11 @@ class SpartaBot(MagicRobot):
         self.talon_R_1.setNeutralMode(COAST_MODE)
         self.talon_R_2.setNeutralMode(COAST_MODE)
 
-
         self.navx = navx.AHRS.create_spi()
 
     def disabledInit(self) -> None:
         self.navx.reset()
-    
+
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -166,19 +171,18 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getRightStickButtonReleased():
             self.solenoid_gear.toggle()
-        
+
         if self.drive_controller.getLeftStickButtonReleased():
             self.talon_L_1.setNeutralMode(BRAKE_MODE)
             self.talon_L_2.setNeutralMode(BRAKE_MODE)
             self.talon_R_1.setNeutralMode(BRAKE_MODE)
             self.talon_R_2.setNeutralMode(BRAKE_MODE)
 
-
         if self.drive_controller.getXButton():
             self.gyro.balancing()
+
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
-            
 
 
 if __name__ == '__main__':
