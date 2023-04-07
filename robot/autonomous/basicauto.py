@@ -32,7 +32,7 @@ class Autonomous(AutonomousStateMachine):
     
     @state(next_state = "clamp")
     def slight_arm_raise(self):
-        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != -500):
+        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition <= -500):
             self.boom_arm.set_rotator(0.2)
         else:
             self.next_state_now("clamp")
@@ -45,7 +45,7 @@ class Autonomous(AutonomousStateMachine):
     @state(next_state = "extend")
     def rotate_arm(self):
         self.boom_arm.set_rotator(0)
-        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != -2000):
+        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition <= -2000):
             self.boom_arm.set_rotator(0.2)
         else:
             self.next_state_now("extend")
@@ -53,7 +53,7 @@ class Autonomous(AutonomousStateMachine):
     @state(next_state = "drop")
     def extend(self):
         self.boom_arm.set_rotator(0)
-        if (self.boom_extender_motor_encoder.getPosition != 40):
+        if (self.boom_extender_motor_encoder.getPosition <= 39):
             self.boom_arm.set_extender(0.2)
         else:
             self.next_state_now("drop")
@@ -65,7 +65,7 @@ class Autonomous(AutonomousStateMachine):
 
     @state(next_state = "rotate_arm_back")
     def retract(self):
-        if (self.boom_extender_motor_encoder.getPosition != 0):
+        if (self.boom_extender_motor_encoder.getPosition <= 0):
             self.boom_arm.set_extender(-0.2)
         else:
             self.next_state_now("rotate_arm_back")
@@ -73,7 +73,7 @@ class Autonomous(AutonomousStateMachine):
     @state(next_state = "move_forward")
     def rotate_arm_back(self):
         self.boom_arm.set_extender(0)
-        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != 0):
+        if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition <= 0):
             self.boom_arm.set_rotator(-0.2)
         else:
             self.next_state_now("move_forward")
@@ -81,7 +81,7 @@ class Autonomous(AutonomousStateMachine):
     @state(next_state = "balance")
     def move_forward(self):
         self.boom_arm.set_rotator(0)
-        if (self.drivetrain.drivetrain_encoder_left != -200):
+        if (self.drivetrain.drivetrain_encoder_left <= -200):
             self.drivetrain.set_motors(-0.5, 0)
         else:
             self.next_state_now("balance")
