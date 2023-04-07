@@ -5,7 +5,6 @@ from magicbot import MagicRobot
 
 class Grabber:
 
-    # Lol grabber LOL Lol KolOL LOl Ol O L O L O l o L
     compressor : wpilib.Compressor
     solenoid1 : wpilib.DoubleSolenoid
     solenoid_gear : wpilib.DoubleSolenoid

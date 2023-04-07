@@ -3,12 +3,11 @@ from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 import rev
 from ctre import WPI_TalonFX
-
 from tools.utils import Lim
-
-
-SPEED_MULTIPLIER = 1
-ANGLE_MULTIPLIER = 1
+from config.constants import(
+    SPEED_MULTIPLIER,
+    ANGLE_MULTIPLIER
+)
 
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless

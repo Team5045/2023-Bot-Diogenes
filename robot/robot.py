@@ -14,7 +14,13 @@ from components.drivetrain import DriveTrain
 from components.encoders import Encoder
 from components.grabber import Grabber
 from components.gyro import Gyro
-
+from config.constants import(
+    SPEED_MULTIPLIER,
+    ANGLE_MULTIPLIER,
+    WINDING_SPEED,
+    INPUT_SENSITIVITY
+)
+# NOTE: We are now importing from the constants file
 # Download and install stuff on the RoboRIO after imaging
 '''
 py -3 -m robotpy_installer download-python
@@ -37,20 +43,15 @@ python robot/robot.py deploy --skip-tests
 py robot/robot.py deploy --skip-tests --no-version-check
 '''
 
-
-INPUT_SENSITIVITY = 0.05
-
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
 MagicRobot.control_loop_wait_time = 0.05
+# Magicbot cycle times
 
-SPEED_MULTIPLIER = 1
-ANGLE_MULTIPLIER = 1
-
-WINDING_SPEED = .2
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
+#The two modes used for breaking on the robot
 
 
 class SpartaBot(MagicRobot):

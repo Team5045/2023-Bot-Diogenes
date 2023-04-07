@@ -2,13 +2,13 @@ import rev
 from ctre import WPI_TalonFX
 from networktables import NetworkTable
 from tools.utils import Lim
+from config.constants import(
+    STRING_LEN,
+    CHAIN_LEN,
+    BUFFER_DISTANCE
+)
 
 # from components.encoders import encoders
-
-STRING_LEN = 28.5  # (inches)
-CHAIN_LEN = 40  # (encoder ticks)
-BUFFER_DISTANCE = 2  # (encoder ticks)
-
 
 class Boom:
     boom_extender_motor: rev.CANSparkMax

@@ -6,6 +6,12 @@ import ctre
 import networktables
 from networktables import NetworkTable
 from magicbot import MagicRobot
+from config.constants import (
+    MAX_RANGE_LIM_HI,
+    MAX_RANGE_LIM_LOW,
+    DEFAULT_LOW,
+    DEFAULT_HI,
+)
 # Various imports
 
 class Gyro():
@@ -18,10 +24,6 @@ class Gyro():
         # Sets up the navx AHRS system
 
     def balancing(self):
-        MAX_RANGE_LIM_HI = 180
-        MAX_RANGE_LIM_LOW = -180
-        DEFAULT_LOW = -5
-        DEFAULT_HI = 5
         angle = self.navx.getRoll()
         # Various variables that are used in the calculations
         ''' Just making things a bit easier to read here with variables'''
@@ -66,7 +68,7 @@ class Gyro():
         self.sd.putValue("MODE: ", "navx_reset")
         print("STATE: RESETTING NAVX")
     
-    def execute(self):
+    def execute(self) -> None:
         # just passes through this to execute gyro in robot.py
         pass
             

@@ -10,14 +10,6 @@ import wpilib
 from networktables import NetworkTables
 from components.drivetrain import DriveTrain
 
-
-LED_ON = 1
-LED_OFF = 0
-LED_PartialRight = 2
-LED_PartialLeft = 3
-# Uh idk really how to turn on limelight in the code yet so ima just use the limelight finder tool to do that for now
-
-
 class aiming:
     limelight = NetworkTables.getTable("limelight")
     sd = NetworkTables.getTable('SmartDashboard')
