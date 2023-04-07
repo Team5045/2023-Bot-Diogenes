@@ -32,11 +32,11 @@ class Autonomous(AutonomousStateMachine):
         self.boom_arm.set_rotator(0)
 
     @timed_state(duration = 2.25, next_state = "Drop")
-    def ExtendArm(self):
+    def Rotate(self):
         self.boom_arm.set_rotator(-0.2)
         self.sd.putValue("Mode: ", "Extending Arm")
 
-    @state(next_state = "Retract")
+    @state(next_state = "retract")
     def Drop(self):
         self.boom_arm.set_rotator(0.0)
         self.grabber.solenoid_toggle()
