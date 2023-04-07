@@ -1,7 +1,7 @@
 from wpilib import MotorControllerGroup
 from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
-
+import rev
 from ctre import WPI_TalonFX
 
 from tools.utils import Lim
@@ -10,6 +10,8 @@ from tools.utils import Lim
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
+MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
+MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
 
 class DriveTrain:
 
@@ -25,6 +27,11 @@ class DriveTrain:
 
     def setup(self):
         """instead of __init__(), use setup() to initialize values (works with magicirobot variable injection"""
+        self.drivetrain_encoder_motor_right: rev.CANSparkMax = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        self.drivetrain_encoder_motor_left: rev.CANSparkMax = rev.CANSparkMax(2, MOTOR_BRUSHLESS)
+
+        self.drivetrain_encoder_right = self.drivetrain_encoder_motor_right.getEncoder()
+        self.drivetrain_encoder_left = self.drivetrain_encoder_motor_left.getEncoder()
 
         self.speed = 0
         self.angle = 0
