@@ -35,7 +35,6 @@ class Autonomous(AutonomousStateMachine):
     def slight_arm_raise(self):
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -500):
             self.boom_arm.set_rotator(-0.2)
-            # from allen: the arm rotating backwards will be a negative value, so i changed it for u 
         else:
             self.next_state("clamp")
 
