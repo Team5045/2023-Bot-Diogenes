@@ -199,7 +199,6 @@ class SpartaBot(MagicRobot):
         #     self.grabber.solenoid_toggle()
 
         if self.drive_controller.getBButtonReleased():
-            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
             self.grabber.toggle_compressor()
 
         # if self.drive_controller.getYButton():
