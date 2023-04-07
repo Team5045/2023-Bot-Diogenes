@@ -29,26 +29,30 @@ class Autonomous(AutonomousStateMachine):
         self.navx = navx.AHRS.create_spi()
         self.gyro.reset()
         self.boom_extender_motor_encoder.setPosition(0)
+        self.next_state("slight_arm_raise")
     
     @state
     def slight_arm_raise(self):
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -500):
-            self.boom_arm.set_rotator(0.2)
+            self.boom_arm.set_rotator(-0.2)
+            # from allen: the arm rotating backwards will be a negative value, so i changed it for u 
         else:
-            self.next_state_now("clamp")
+            self.next_state("clamp")
 
     @state
     def clamp(self):
         self.grabber.solenoid_toggle()
+        self.next_state("rotate_arm")
     
     
     @state
     def rotate_arm(self):
         self.boom_arm.set_rotator(0)
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -2000):
-            self.boom_arm.set_rotator(0.2)
+            self.boom_arm.set_rotator(-0.2)
+            # same thing here
         else:
-            self.next_state_now("extend")
+            self.next_state("extend")
     
     @state
     def extend(self):
@@ -56,27 +60,28 @@ class Autonomous(AutonomousStateMachine):
         if (self.boom_extender_motor_encoder.getPosition() <= 5):
             self.boom_arm.set_extender(0.2)
         else:
-            self.next_state_now("drop")
+            self.next_state("drop")
 
     @state
     def drop(self):
         self.boom_arm.set_extender(0)
         self.grabber.solenoid_toggle()
+        self.next_state("retract")
 
     @state
     def retract(self):
         if (self.boom_extender_motor_encoder.getPosition() <= 0):
             self.boom_arm.set_extender(-0.2)
         else:
-            self.next_state_now("rotate_arm_back")
+            self.next_state("rotate_arm_back")
 
     @state
     def rotate_arm_back(self):
         self.boom_arm.set_extender(0)
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= 0):
-            self.boom_arm.set_rotator(-0.2)
+            self.boom_arm.set_rotator(0.2)
         else:
-            self.next_state_now("move_forward")
+            self.next_state("move_forward")
 
     @state
     def move_forward(self):
@@ -84,7 +89,7 @@ class Autonomous(AutonomousStateMachine):
         if (self.drivetrain.drivetrain_encoder_left <= -200):
             self.drivetrain.set_motors(-0.5, 0)
         else:
-            self.next_state_now("balance")
+            self.next_state("balance")
 
     @state
     def balance(self):
@@ -95,7 +100,7 @@ class Autonomous(AutonomousStateMachine):
         if (self.navx.getRoll() > 5) and (self.navx.getRoll() < -5):
             self.gyro.balancing()
         else:
-            self.next_state_now("Done")
+            self.next_state("Done")
     @state
     def Done(self):
         self.drivetrain.set_motors(0, 0)
