@@ -3,9 +3,13 @@ from wpilib.drive import DifferentialDrive
 from networktables import NetworkTable
 import rev
 from ctre import WPI_TalonFX
+from ctre import NeutralMode
+
 
 from tools.utils import Lim
 
+
+SENSITIVITY = 0.05
 
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
@@ -57,6 +61,15 @@ class DriveTrain:
 
         self.sd.putValue("Speed", self.speed)
         self.sd.putValue("Angle", self.angle)
+
+    def set_mode(self, mode: NeutralMode) -> None:
+        self.talon_L_1.setNeutralMode(mode)
+        self.talon_L_2.setNeutralMode(mode)
+        self.talon_R_1.setNeutralMode(mode)
+        self.talon_R_2.setNeutralMode(mode)
+
+    def is_moving(self) -> bool:
+        return (abs(self.speed) > SENSITIVITY) and (abs(self.angle) > SENSITIVITY)
 
     def execute(self) -> None:
         """
