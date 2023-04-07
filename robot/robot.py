@@ -102,7 +102,8 @@ class SpartaBot(MagicRobot):
         self.navx = navx.AHRS.create_spi()
 
         # PID
-        self.armPID = PIDController(0.00005, 0, 0, 0.02)
+        self.armPID = PIDController(0.00005, 0.0001, 0, 0.02)
+        self.armPID.setTolerance(100)
         self.pidTarget = -10000
         self.pidOutput = 0
 
@@ -135,7 +136,9 @@ class SpartaBot(MagicRobot):
         '''
 
         if (not self.armPID.atSetpoint()):
-            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
+            self.armPID.setSetpoint(self.pidTarget)
+            # self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
+            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
         else:
             self.pidOutput = 0
 
