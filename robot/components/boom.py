@@ -51,7 +51,7 @@ class Boom:
         self.sd.putValue("Boom Extender Position: ", encoder.getPosition())
 
     def set_rotator(self, motor_speed: float):
-        self.rotator_speed = Lim.limit(motor_speed, [-1, 1])
+        self.rotator_speed = Lim.limit(motor_speed, [-0.7, 0.7])
 
         self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
 

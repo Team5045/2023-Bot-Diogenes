@@ -162,7 +162,7 @@ class Autonomous(AutonomousStateMachine):
 
     @timed_state(duration=1, next_state="Done", first=True)
     def Moveback(self):
-        self.boom_arm.set_extender(0.0)
+        self.boom_arm.set_extender(0, self.boom_extender_motor_encoder)
         self.boom_arm.set_rotator(0.0)
         self.drivetrain.set_motors(-0.5, 0.0)
         self.sd.putValue("Mode: ", "Taxi for Points")

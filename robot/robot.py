@@ -7,6 +7,7 @@ from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
+from wpimath.controller import PIDController
 
 from components.boom import Boom
 from components.drivetrain import DriveTrain
@@ -100,6 +101,11 @@ class SpartaBot(MagicRobot):
 
         self.navx = navx.AHRS.create_spi()
 
+        # PID
+        self.armPID = PIDController(0.00005, 0, 0, 0.02)
+        self.pidTarget = -10000
+        self.pidOutput = 0
+
     def disabledInit(self) -> None:
         self.navx.reset()
 
@@ -107,13 +113,15 @@ class SpartaBot(MagicRobot):
 
     def disabledInit(self) -> None:
         self.navx.reset()
-    
+
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
         self.boom_extender_motor_encoder.setPosition(0)
+        self.boom_rotator_motor.setSelectedSensorPosition(0)
+        self.armPID.reset()
         self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
@@ -125,6 +133,11 @@ class SpartaBot(MagicRobot):
         Called on each iteration of the control loop\n
         NOTE: all components' execute() methods will be called automatically
         '''
+
+        if (not self.armPID.atSetpoint()):
+            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
+        else:
+            self.pidOutput = 0
 
         # drive controls
         # print("tele")
@@ -151,8 +164,14 @@ class SpartaBot(MagicRobot):
 
         self.boom_arm.set_rotator(0)
 
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed / 5)
+        # if (abs(rot_speed) > INPUT_SENSITIVITY):
+        #     self.boom_arm.set_rotator(rot_speed / 5)
+
+        if self.drive_controller.getYButton():
+            self.boom_arm.set_rotator(self.pidOutput)
+
+        self.sd.putValue("rotator encoder", self.boom_rotator_motor.getSelectedSensorPosition())
+        self.sd.putValue("rotator pid", self.pidOutput)
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
@@ -171,6 +190,7 @@ class SpartaBot(MagicRobot):
         #     self.grabber.solenoid_toggle()
 
         if self.drive_controller.getBButtonReleased():
+            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
             self.grabber.toggle_compressor()
 
         # if self.drive_controller.getYButton():
