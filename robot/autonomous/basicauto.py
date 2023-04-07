@@ -24,25 +24,25 @@ class Autonomous(AutonomousStateMachine):
     encoder: Encoder
     boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder
 
-    @state(first = True, next_state = "slight_arm_raise")
+    @state(first = True)
     def start(self):
         self.navx = navx.AHRS.create_spi()
         self.gyro.reset()
         self.boom_extender_motor_encoder.setPosition(0)
     
-    @state(next_state = "clamp")
+    @state
     def slight_arm_raise(self):
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -500):
             self.boom_arm.set_rotator(0.2)
         else:
             self.next_state_now("clamp")
 
-    @state(next_state = "rotate_back")
+    @state
     def clamp(self):
         self.grabber.solenoid_toggle()
     
     
-    @state(next_state = "extend")
+    @state
     def rotate_arm(self):
         self.boom_arm.set_rotator(0)
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -2000):
@@ -50,7 +50,7 @@ class Autonomous(AutonomousStateMachine):
         else:
             self.next_state_now("extend")
     
-    @state(next_state = "drop")
+    @state
     def extend(self):
         self.boom_arm.set_rotator(0)
         if (self.boom_extender_motor_encoder.getPosition() <= 5):
@@ -58,19 +58,19 @@ class Autonomous(AutonomousStateMachine):
         else:
             self.next_state_now("drop")
 
-    @state(next_state = "retract")
+    @state
     def drop(self):
         self.boom_arm.set_extender(0)
         self.grabber.solenoid_toggle()
 
-    @state(next_state = "rotate_arm_back")
+    @state
     def retract(self):
         if (self.boom_extender_motor_encoder.getPosition() <= 0):
             self.boom_arm.set_extender(-0.2)
         else:
             self.next_state_now("rotate_arm_back")
 
-    @state(next_state = "move_forward")
+    @state
     def rotate_arm_back(self):
         self.boom_arm.set_extender(0)
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= 0):
@@ -78,7 +78,7 @@ class Autonomous(AutonomousStateMachine):
         else:
             self.next_state_now("move_forward")
 
-    @state(next_state = "balance")
+    @state
     def move_forward(self):
         self.boom_arm.set_rotator(0)
         if (self.drivetrain.drivetrain_encoder_left <= -200):
@@ -86,7 +86,7 @@ class Autonomous(AutonomousStateMachine):
         else:
             self.next_state_now("balance")
 
-    @state(next_state = "Done")
+    @state
     def balance(self):
         self.drivetrain.talon_L_1.setNeutralMode(BRAKE_MODE)
         self.drivetrain.talon_L_2.setNeutralMode(BRAKE_MODE)
