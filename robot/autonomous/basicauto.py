@@ -99,10 +99,8 @@ class Autonomous(AutonomousStateMachine):
         if (self.navx.getRoll() > 5) and (self.navx.getRoll() < -5):
             self.gyro.balancing()
         else:
-            self.next_state("Done")
-    @state
-    def Done(self):
-        self.drivetrain.set_motors(0, 0)
-        self.boom_arm.set_extender(0)
-        self.boom_arm.set_rotator(0)
-        self.sd.putValue("Mode: ", "Completed!")
+            self.drivetrain.set_motors(0, 0)
+            self.boom_arm.set_extender(0)
+            self.boom_arm.set_rotator(0)
+            self.sd.putValue("Mode: ", "Completed!")
+            self.done()
