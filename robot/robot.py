@@ -123,7 +123,7 @@ class SpartaBot(MagicRobot):
         self.boom_extender_motor_encoder.setPosition(0)
         self.boom_rotator_motor.setSelectedSensorPosition(0)
         self.armPID.reset()
-        self.compressor.disable()
+        # self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
         # print("limelight on")

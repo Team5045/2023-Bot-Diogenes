@@ -1,15 +1,15 @@
 # This is the Magnolia regional Temporary unfinished autonomous
 # Without any gyroscope abilities or anything. 
+import navx
 import networktables
+import rev
 from components.boom import Boom
 from components.drivetrain import DriveTrain
+from components.encoders import Encoder
 from components.grabber import Grabber
 from components.gyro import Gyro
-from components.encoders import Encoder
-from magicbot import AutonomousStateMachine, state, timed_state
-import navx
-import rev
 from ctre import NeutralMode
+from magicbot import AutonomousStateMachine, state
 
 BRAKE_MODE = NeutralMode(2)
 COAST_MODE = NeutralMode(1)
@@ -24,18 +24,17 @@ class Autonomous(AutonomousStateMachine):
     encoder: Encoder
     boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder
 
-    @state(first = True)
+    @state(first=True)
     def start(self):
         self.navx = navx.AHRS.create_spi()
         self.gyro.reset()
         self.boom_extender_motor_encoder.setPosition(0)
         self.next_state("slight_arm_raise")
-    
+
     @state
     def slight_arm_raise(self):
         if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition() <= -500):
             self.boom_arm.set_rotator(-0.2)
-            # from allen: the arm rotating backwards will be a negative value, so i changed it for u 
         else:
             self.next_state("clamp")
 
@@ -43,8 +42,7 @@ class Autonomous(AutonomousStateMachine):
     def clamp(self):
         self.grabber.solenoid_toggle()
         self.next_state("rotate_arm")
-    
-    
+
     @state
     def rotate_arm(self):
         self.boom_arm.set_rotator(0)
@@ -58,7 +56,7 @@ class Autonomous(AutonomousStateMachine):
     def extend(self):
         self.boom_arm.set_rotator(0)
         if (self.boom_extender_motor_encoder.getPosition() <= 5):
-            self.boom_arm.set_extender(0.2)
+            self.boom_arm.set_extender(0.2, self.boom_extender_motor_encoder)
         else:
             self.next_state("drop")
 
