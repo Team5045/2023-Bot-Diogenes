@@ -152,32 +152,39 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(speed, -angle)
 
             self.sd.putValue('Drivetrain: ', 'moving')
+            self.talon_L_1.setNeutralMode(COAST_MODE)
+            self.talon_L_2.setNeutralMode(COAST_MODE)
+            self.talon_R_1.setNeutralMode(COAST_MODE)
+            self.talon_R_2.setNeutralMode(COAST_MODE)
 
         else:
             # reset value to make robot stop moving
+            self.talon_L_1.setNeutralMode(BRAKE_MODE)
+            self.talon_L_2.setNeutralMode(BRAKE_MODE)
+            self.talon_R_1.setNeutralMode(BRAKE_MODE)
+            self.talon_R_2.setNeutralMode(BRAKE_MODE)
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        # rot_speed = 0
+        rot_speed = 0
 
-        # rot_speed += self.drive_controller.getRightTriggerAxis()
-        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
+        rot_speed += self.drive_controller.getRightTriggerAxis()
+        rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        # self.boom_arm.set_rotator(0)
+        self.boom_arm.set_rotator(0)
 
         # pidTarget = -10000
 
         # pidTarget += self.drive_controller.getRightTriggerAxis()
         # pidTarget -= self.drive_controller.getLeftTriggerAxis()
 
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_arm.set_rotator(rot_speed / 5)
 
-        # if (abs(rot_speed) > INPUT_SENSITIVITY):
-        #     self.boom_arm.set_rotator(rot_speed / 5)
-
-        if self.drive_controller.getYButton():
-            self.boom_arm.set_rotator(self.pidOutput)
+        # if self.drive_controller.getYButton():
+        #     self.boom_arm.set_rotator(self.pidOutput)
 
         self.sd.putValue("rotator encoder", self.boom_rotator_motor.getSelectedSensorPosition())
         self.sd.putValue("rotator pid", self.pidOutput)
@@ -208,18 +215,18 @@ class SpartaBot(MagicRobot):
         # if self.drive_controller.getRightStickButtonReleased():
         #     self.solenoid_gear.toggle()
 
-        if self.drive_controller.getLeftStickButtonReleased():
-            self.talon_L_1.setNeutralMode(BRAKE_MODE)
-            self.talon_L_2.setNeutralMode(BRAKE_MODE)
-            self.talon_R_1.setNeutralMode(BRAKE_MODE)
-            self.talon_R_2.setNeutralMode(BRAKE_MODE)
+        # if self.drive_controller.getLeftStickButtonReleased():
+        #     self.talon_L_1.setNeutralMode(BRAKE_MODE)
+        #     self.talon_L_2.setNeutralMode(BRAKE_MODE)
+        #     self.talon_R_1.setNeutralMode(BRAKE_MODE)
+        #     self.talon_R_2.setNeutralMode(BRAKE_MODE)
+        # get hacked!
 
         if self.drive_controller.getXButton():
             self.gyro.balancing()
 
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
-
 
         if self.drive_controller.getXButton():
             self.gyro.balancing()
