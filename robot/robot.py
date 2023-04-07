@@ -157,12 +157,18 @@ class SpartaBot(MagicRobot):
 
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        rot_speed = 0
+        # rot_speed = 0
 
-        rot_speed += self.drive_controller.getRightTriggerAxis()
-        rot_speed -= self.drive_controller.getLeftTriggerAxis()
+        # rot_speed += self.drive_controller.getRightTriggerAxis()
+        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_rotator(0)
+        # self.boom_arm.set_rotator(0)
+
+        # pidTarget = -10000
+
+        # pidTarget += self.drive_controller.getRightTriggerAxis()
+        # pidTarget -= self.drive_controller.getLeftTriggerAxis()
+
 
         # if (abs(rot_speed) > INPUT_SENSITIVITY):
         #     self.boom_arm.set_rotator(rot_speed / 5)
