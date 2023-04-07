@@ -5,8 +5,10 @@ from components.boom import Boom
 from components.drivetrain import DriveTrain
 from components.grabber import Grabber
 from components.gyro import Gyro
+from components.encoders import Encoder
 from magicbot import AutonomousStateMachine, state, timed_state
 import navx
+import rev
 
 
 class Autonomous(AutonomousStateMachine):
@@ -17,7 +19,7 @@ class Autonomous(AutonomousStateMachine):
     boom_arm: Boom
     grabber: Grabber
     gyro: Gyro
-
+    
     # @timed_state(duration = 0.75, next_state = "grabit", first = True)
     # def start(self):
     #     self.boom_arm.set_rotator(-0.2)
@@ -120,23 +122,41 @@ class Autonomous(AutonomousStateMachine):
         boom_arm: Boom
         grabber: Grabber
         gyro: Gyro
+        encoder: Encoder
+        boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder
+        
     
         @state(first = True, next_state = "slight_arm_raise")
         def start(self):
             self.navx = navx.AHRS.create_spi()
             self.gyro.reset()
-            self.boom_arm.boom_extender_motor.getEncoder().setPosition(0)
+            self.boom_extender_motor_encoder.setPosition(0)
         
         @state(next_state = "clamp")
         def slight_arm_raise(self):
+            if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != -3000):
+                self.boom_arm.set_rotator(0.2)
+            else:
+                self.next_state_now("clamp")
     
         @state(next_state = "rotate_back")
         def clamp(self):
             self.grabber.solenoid_toggle()
-    
-        @state(next_state = "drop")
+        
+        
+        @state(next_state = "extend")
         def rotate_arm(self):
-            if self.boom_arml
+            if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != -10000):
+                self.boom_arm.set_rotator(0.2)
+            else:
+                self.next_state_now("extend")
+        
+        @state(next_state = "drop")
+        def extend(self):
+            if (self.boom_extender_motor_encoder.getPosition != 40):
+                self.boom_arm.set_extender(0.2)
+            else:
+                self.next_state_now("drop")
     
         @state(next_state = "retract")
         def drop(self):
@@ -144,12 +164,21 @@ class Autonomous(AutonomousStateMachine):
     
         @state(next_state = "rotate_arm_back")
         def retract(self):
+            if (self.boom_extender_motor_encoder.getPosition != 0):
+                self.boom_arm.set_extender(-0.2)
+            else:
+                self.next_state_now("rotate_arm_back")
     
         @state(next_state = "move_forward")
         def rotate_arm_back(self):
+            if (self.boom_arm.boom_rotator_motor.getSelectedSensorPosition != 0):
+                self.boom_arm.set_rotator(-0.2)
+            else:
+                self.next_state_now("move_forward")
     
         @state(next_state = "balance")
         def move_forward(self):
+            if ()
     
         @state(next_state = "Done")
         def balance(self):
