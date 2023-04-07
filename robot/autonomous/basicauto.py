@@ -92,7 +92,7 @@ class Autonomous(AutonomousStateMachine):
         self.drivetrain.talon_L_2.setNeutralMode(BRAKE_MODE)
         self.drivetrain.talon_R_1.setNeutralMode(BRAKE_MODE)
         self.drivetrain.talon_R_2.setNeutralMode(BRAKE_MODE)
-        if (self.navx.getRoll > 5) and (self.navx.getRoll < -5):
+        if (self.navx.getRoll() > 5) and (self.navx.getRoll() < -5):
             self.gyro.balancing()
         else:
             self.next_state_now("Done")
