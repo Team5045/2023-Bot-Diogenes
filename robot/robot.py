@@ -78,8 +78,7 @@ class SpartaBot(MagicRobot):
         self.talon_R_1 = WPI_TalonFX(7)
         self.talon_R_2 = WPI_TalonFX(6)
 
-        self.compressor: wpilib.Compressor = wpilib.Compressor(
-            0, PNEUMATICS_MODULE_TYPE)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
 
         self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(
             PNEUMATICS_MODULE_TYPE, 2, 3)
@@ -213,8 +212,8 @@ class SpartaBot(MagicRobot):
         #     aiming.side_to_side(self)
         #     aiming.forward_backward(self)
 
-        # if self.drive_controller.getRightStickButtonReleased():
-        #     self.solenoid_gear.toggle()
+        if self.drive_controller.getRightStickButtonReleased():
+            self.solenoid_gear.toggle()
 
         # if self.drive_controller.getLeftStickButtonReleased():
         #     self.talon_L_1.setNeutralMode(BRAKE_MODE)
