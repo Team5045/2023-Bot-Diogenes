@@ -102,6 +102,8 @@ class SpartaBot(MagicRobot):
 
         self.navx = navx.AHRS.create_spi()
 
+        self.isbreaking = False
+
         # PID
         self.armPID = PIDController(0.00005, 0.0001, 0, 0.02)
         self.armPID.setTolerance(100)
@@ -148,23 +150,61 @@ class SpartaBot(MagicRobot):
         angle = self.drive_controller.getRightX()
         speed = self.drive_controller.getLeftY()
 
-        mode = self.drivetrain.is_moving()
+        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+            if self.isbreaking:
+                # print("setting coast mode")
+                self.talon_L_1.setNeutralMode(COAST_MODE)
+                self.talon_L_2.setNeutralMode(COAST_MODE)
+                self.talon_R_1.setNeutralMode(COAST_MODE)
+                self.talon_R_2.setNeutralMode(COAST_MODE)
+                self.isbreaking = False
 
-        if (mode != self.prev_mode_moving):
-            print("changed mode!")
-            if (mode):
+            self.drivetrain.set_motors(speed, -angle)
 
-                self.drivetrain.set_motors(speed, -angle)
-                self.drivetrain.set_mode(COAST_MODE)
-                self.sd.putValue('Drivetrain: ', 'moving')
+            self.sd.putValue('Drivetrain: ', 'moving')
+            #
+            # self.talon_L_1.setNeutralMode(COAST_MODE)
+            # self.talon_L_2.setNeutralMode(COAST_MODE)
+            # self.talon_R_1.setNeutralMode(COAST_MODE)
+            # self.talon_R_2.setNeutralMode(COAST_MODE)
 
-            else:
-                # reset value to make robot stop moving
-                self.drivetrain.set_mode(BRAKE_MODE)
-                self.drivetrain.set_motors(0.0, 0.0)
-                self.sd.putValue('Drivetrain: ', 'static')
+        else:
+            if not self.isbreaking:
+                # print("setting brake mode")
+                self.talon_L_1.setNeutralMode(BRAKE_MODE)
+                self.talon_L_2.setNeutralMode(BRAKE_MODE)
+                self.talon_R_1.setNeutralMode(BRAKE_MODE)
+                self.talon_R_2.setNeutralMode(BRAKE_MODE)
+                self.isbreaking = True
+            # reset value to make robot stop moving
+            self.drivetrain.set_motors(0.0, 0.0)
+            #
+            # self.talon_L_1.setNeutralMode(BRAKE_MODE)
+            # self.talon_L_2.setNeutralMode(BRAKE_MODE)
+            # self.talon_R_1.setNeutralMode(BRAKE_MODE)
+            # self.talon_R_2.setNeutralMode(BRAKE_MODE)
 
-        self.prev_mode_moving = mode
+            self.sd.putValue('Drivetrain: ', 'static')
+
+        # mode = self.drivetrain.is_moving()
+        #
+        #
+        #
+        # if (mode != self.prev_mode_moving):
+        #     print("changed mode!")
+        #     if (mode):
+        #
+        #         self.drivetrain.set_motors(speed, -angle)
+        #         self.drivetrain.set_mode(COAST_MODE)
+        #         self.sd.putValue('Drivetrain: ', 'moving')
+        #
+        #     else:
+        #         # reset value to make robot stop moving
+        #         self.drivetrain.set_mode(BRAKE_MODE)
+        #         self.drivetrain.set_motors(0.0, 0.0)
+        #         self.sd.putValue('Drivetrain: ', 'static')
+        #
+        # self.prev_mode_moving = mode
 
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
@@ -179,6 +219,7 @@ class SpartaBot(MagicRobot):
 
         # pidTarget += self.drive_controller.getRightTriggerAxis()
         # pidTarget -= self.drive_controller.getLeftTriggerAxis()
+
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
             self.boom_arm.set_rotator(rot_speed / 5)
