@@ -15,6 +15,7 @@ from components.grabber import Grabber
 from components.gyro import Gyro
 
 from controllers.Rotate_Controller import Rotate_Controller
+from controllers.boom_controller import BoomController
 
 
 # Download and install stuff on the RoboRIO after imaging
@@ -64,6 +65,7 @@ class SpartaBot(MagicRobot):
     grabber: Grabber
     gyro: Gyro
     test: Rotate_Controller
+    boom_controller: BoomController
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -215,7 +217,11 @@ class SpartaBot(MagicRobot):
         rot_speed += self.drive_controller.getRightTriggerAxis()
         rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_rotator(0)
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_arm.set_rotator(rot_speed / 5)
+            self.boom_controller.use_current_setpoint()
+        else:
+            self.boom_controller.goto_setpoint()
 
         # pidTarget = -10000
 
@@ -223,8 +229,6 @@ class SpartaBot(MagicRobot):
         # pidTarget -= self.drive_controller.getLeftTriggerAxis()
 
 
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed / 5)
 
         # if self.drive_controller.getYButton():
         #     self.boom_arm.set_rotator(self.pidOutput)
