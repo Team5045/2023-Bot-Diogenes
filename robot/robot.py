@@ -4,16 +4,17 @@ from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
+import navx
 
 from components.drivetrain import DriveTrain
-from components.gyro import Gyro
 from components.boom import Boom
 from components.grabber import Grabber
+# from components.encoders import encoders
+from components.gyro import Gyro
 import wpilib.drive
-from robotpy_ext.autonomous import AutonomousModeSelector
 
 from components.LimeLight import aiming
-
+from ctre import NeutralMode
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -48,6 +49,9 @@ MagicRobot.control_loop_wait_time = 0.05
 SPEED_MULTIPLIER = 1
 ANGLE_MULTIPLIER = 1
 
+WINDING_SPEED = .5
+BRAKE_MODE = NeutralMode(2)
+COAST_MODE = NeutralMode(1)
 
 class SpartaBot(MagicRobot):
 
@@ -55,6 +59,7 @@ class SpartaBot(MagicRobot):
 
     drivetrain: DriveTrain
     boom_arm: Boom
+    grabber : Grabber
     gyro: Gyro
 
     def createObjects(self):
@@ -63,7 +68,7 @@ class SpartaBot(MagicRobot):
         NetworkTables.initialize(server='roborio-5045-frc.local')
         self.sd: NetworkTable = NetworkTables.getTable('SmartDashboard')
 
-        self.drive_controller = wpilib.XboxController(0)  # 0 works for sim?
+        self.drive_controller: wpilib.XboxController = wpilib.XboxController(0)  # 0 works for sim?
 
         self.talon_L_1 = WPI_TalonFX(4)
         self.talon_L_2 = WPI_TalonFX(8)
@@ -73,16 +78,28 @@ class SpartaBot(MagicRobot):
 
         # self.boom_rotator_spark = WPI_TalonFX(3)
 
-        self.compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
-        self.solenoid1 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
-        self.solenoid2 = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 6, 7)
-        self.gear_solenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+        self.compressor: wpilib.Compressor = wpilib.Compressor(0, PNEUMATICS_MODULE_TYPE)
+
+        self.solenoid1: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 2, 3)
+        self.solenoid_gear: wpilib.DoubleSolenoid = wpilib.DoubleSolenoid(PNEUMATICS_MODULE_TYPE, 0, 1)
+
         self.solenoid1.set(DoubleSolenoid.Value.kForward)
-        self.solenoid2.set(DoubleSolenoid.Value.kForward)
+        self.solenoid_gear.set(DoubleSolenoid.Value.kForward)
 
-        self.boom_extender_spark = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
-        self.boom_rotator_spark = rev.CANSparkMax(1, MOTOR_BRUSHLESS)
+        self.boom_extender_spark: rev.CANSparkMax = rev.CANSparkMax(4, MOTOR_BRUSHLESS)
+        self.boom_rotator_spark = WPI_TalonFX(3)
 
+        self.talon_L_1.setNeutralMode(COAST_MODE)
+        self.talon_L_2.setNeutralMode(COAST_MODE)
+        self.talon_R_1.setNeutralMode(COAST_MODE)
+        self.talon_R_2.setNeutralMode(COAST_MODE)
+
+
+        self.navx = navx.AHRS.create_spi()
+
+    def disabledInit(self) -> None:
+        self.navx.reset()
+    
     def disabledPeriodic(self):
         self.sd.putValue("Mode", "Disabled")
 
@@ -105,8 +122,9 @@ class SpartaBot(MagicRobot):
         speed = self.drive_controller.getLeftY()
 
         if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            # inverse values to get inverse controls
-            self.drivetrain.set_motors(-speed, angle)
+
+            self.drivetrain.set_motors(speed, -angle)
+
             self.sd.putValue('Drivetrain: ', 'moving')
 
         else:
@@ -114,44 +132,56 @@ class SpartaBot(MagicRobot):
             self.drivetrain.set_motors(0.0, 0.0)
             self.sd.putValue('Drivetrain: ', 'static')
 
-        # boom controls
-        # if left bumper button pressed, right and left triggers control boom extension
-        #   else, they control angle
-        speed = 0
+        # boom rotation: left/right triggers
+        rot_speed = 0
 
-        speed += self.drive_controller.getRightTriggerAxis()
-        speed -= self.drive_controller.getLeftTriggerAxis()
+        rot_speed += self.drive_controller.getRightTriggerAxis()
+        rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_extender(0)
         self.boom_arm.set_rotator(0)
 
-        if (abs(speed) > INPUT_SENSITIVITY):
-            if self.drive_controller.getLeftBumper():
-                # limit is 0.15 of max speed (prevent overwinding)
-                self.boom_arm.set_extender(3*speed/20)
-            else:
-                self.boom_arm.set_rotator(3*speed/20)
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_arm.set_rotator(rot_speed/5)
+            print(rot_speed)
 
-        # self.drivetrain's execute() method is automatically called
+        # boom extension: bumpers
+        # NOTE: it is assumed that the boom arm is fully retracted
+        wind_speed = 0
 
-        if self.drive_controller.getLeftBumperReleased():
-            Grabber.turn_off_compressor(self)
+        if (self.drive_controller.getRightBumper()):
+            wind_speed -= WINDING_SPEED
 
-        if self.drive_controller.getRightBumperReleased():
-            Grabber.solenoid_toggle(self)
-        
+        if (self.drive_controller.getLeftBumper()):
+            wind_speed += WINDING_SPEED
+
+        self.boom_arm.set_extender(wind_speed)
+
+        # grabber: A button to open/close (switches from one state to another)
+        if self.drive_controller.getAButtonReleased():
+            self.grabber.solenoid_toggle()
+
+        if self.drive_controller.getBButtonReleased():
+            self.grabber.toggle_compressor(self)
+
         if self.drive_controller.getYButton():
             aiming.side_to_side(self)
-            
-        if self.drive_controller.getXButton():
             aiming.forward_backward(self)
-            
-        if self.drive_controller.getBButtonReleased():
-            self.gear_solenoid.toggle()
 
-        if self.drive_controller.getBackButtonPressed():
-            Gyro.pitchmode()
-                
+        if self.drive_controller.getRightStickButtonReleased():
+            self.solenoid_gear.toggle()
+        
+        if self.drive_controller.getLeftStickButtonReleased():
+            self.talon_L_1.setNeutralMode(BRAKE_MODE)
+            self.talon_L_2.setNeutralMode(BRAKE_MODE)
+            self.talon_R_1.setNeutralMode(BRAKE_MODE)
+            self.talon_R_2.setNeutralMode(BRAKE_MODE)
+
+
+        if self.drive_controller.getXButton():
+            self.gyro.balancing()
+        if self.drive_controller.getStartButtonReleased():
+            self.gyro.reset()
+            
 
 
 if __name__ == '__main__':

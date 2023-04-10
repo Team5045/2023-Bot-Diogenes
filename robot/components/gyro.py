@@ -1,57 +1,73 @@
-import wpilib
+# time for a pro gyro no lie
 import navx
-from wpilib.interfaces import Gyro
-from networktables import NetworkTable
 from components.drivetrain import DriveTrain
+import wpilib
+import ctre
+import networktables
+from networktables import NetworkTable
+from magicbot import MagicRobot
+# Various imports
 
-class Gyro:
-
+class Gyro():
+    # MagicBot Variable Injection
+    sd: networktables.NetworkTable
     drivetrain: DriveTrain
-    sd: NetworkTable
+    
+    def setup(self):
+        self.navx = navx.AHRS.create_spi()
+        # Sets up the navx AHRS system
 
-#Gyro.calibrate() should be activated,
-#but with a button or what?
-    def setup(self): #hopefully this works
-        self.gyro = navx._navx.AHRS.create_spi()
-        self.angle = 0
-        self.gain = 1
-        self.pitch = self.gyro.getPitch()
+    def balancing(self):
+        MAX_RANGE_LIM_HI = 180
+        MAX_RANGE_LIM_LOW = -180
+        DEFAULT_LOW = -5
+        DEFAULT_HI = 5
+        angle = self.navx.getRoll()
+        # Various variables that are used in the calculations
+        ''' Just making things a bit easier to read here with variables'''
+        # This should provide constant adjustment to the speeds so it won't jerk the robot
 
-        #getPitch() <-- get this, doing something with motor,
-        #robot doesn't fall off platform
+        print(f'ANGLE_RETURN: {angle}')
 
-    def pitchmode(self):
-        
-        pitch = self.gyro.getPitch()
-        if pitch > 10:
-            self.drivetrain.set_motors(pitch * 0.05, 0.0)
-            self.sd.putValue('Drivetrain: ', 'moving')
+        try:
+        # try and except 
+            if (angle < MAX_RANGE_LIM_HI) and (angle > MAX_RANGE_LIM_LOW):
+                # PRECHECK TO MAKE SURE GYRO IS IN GOOD CONDITION
+                if (angle < DEFAULT_LOW) and (angle > MAX_RANGE_LIM_LOW):
+                    self.drivetrain.set_motors(0.33, 0.0)
+                    self.sd.putValue("Mode: ", "Moving Forward")
+                    print("MODE: ST1")
+                    # Forward
 
-        else:
-            # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
+                elif (angle > DEFAULT_HI) and (angle < MAX_RANGE_LIM_HI):
+                    self.drivetrain.set_motors(-0.33, 0.0)
+                    self.sd.putValue("Mode: ", "Moving Backward")
+                    print("MODE: ST2")
+                    # Backward
 
+                elif (angle < DEFAULT_HI) and (angle > DEFAULT_LOW):
+                    self.drivetrain.set_motors(0.0, 0.0)
+                    self.sd.putValue("Mode: ", "Balanced!")
+                    print("balanced!")
+                    print(self.navx.getPitch())
+                    # Balanced
+            else:
+                # In this case: Either bot is flipped, or error values
+                print("ERROR: OUT OF BOUNDS: E.1")
+                self.drivetrain.set_motors(0.0, 0.0)
+                self.sd.putValue("Mode: ", "GYRO ERROR")
+        except:
+            print("ERROR: EXTERNAL ISSUE: E.2")
 
-        if pitch < -10: #this value is also made up
-        # inverse values to get inverse controls
-            self.drivetrain.set_motors(pitch * -0.05, 0.0)
-            self.sd.putValue('Drivetrain: ', 'moving')
+    # Try and except statement in case something goes bad, this is an effort to protect motors and the robot during autonomous
 
-        else:
-        # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            self.sd.putValue('Drivetrain: ', 'static')
-
-        
+    def reset(self):
+        self.navx.reset()
+        print("STATE: RESETTING NAVX")
+    
     def execute(self):
-
-        """
-        Reads the data from smartdashboard (set by control methods), and then sends data to output devices such as motors.
-        Execute is called in telopPeriodic automatically; no need to manually call
-        """
-
+        pass
+            
 
         
-
         
