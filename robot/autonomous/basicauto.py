@@ -4,7 +4,6 @@ import networktables
 import rev
 from components.boom import Boom
 from components.drivetrain import DriveTrain
-from components.encoders import Encoder
 from components.grabber import Grabber
 from components.gyro import Gyro
 from ctre import NeutralMode
@@ -20,7 +19,6 @@ class Autonomous(AutonomousStateMachine):
     boom_arm: Boom
     grabber: Grabber
     gyro: Gyro
-    encoder: Encoder
     boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder
 
     @timed_state(duration=0.75, next_state="grabit", first=True)

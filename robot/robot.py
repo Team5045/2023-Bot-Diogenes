@@ -11,9 +11,11 @@ from wpimath.controller import PIDController
 
 from components.boom import Boom
 from components.drivetrain import DriveTrain
-from components.encoders import Encoder
 from components.grabber import Grabber
 from components.gyro import Gyro
+
+from controllers.Rotate_Controller import Rotate_Controller
+
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -61,7 +63,7 @@ class SpartaBot(MagicRobot):
     boom_arm: Boom
     grabber: Grabber
     gyro: Gyro
-    encoder: Encoder
+    test: Rotate_Controller
 
     def createObjects(self):
         '''Create motors and stuff here'''

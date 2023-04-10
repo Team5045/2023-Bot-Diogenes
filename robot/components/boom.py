@@ -5,7 +5,6 @@ from tools.utils import Lim
 
 # from components.encoders import encoders
 
-STRING_LEN = 28.5  # (inches)
 CHAIN_LEN = 40  # (encoder ticks)
 BUFFER_DISTANCE = 2  # (encoder ticks)
 
@@ -54,6 +53,9 @@ class Boom:
         self.rotator_speed = Lim.limit(motor_speed, [-0.7, 0.7])
 
         self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
+
+    def get_arm_angle(self):
+        return self.boom_rotator_motor.getSelectedSensorPosition()
 
     def execute(self):
         self.boom_extender_motor.set(self.extender_speed)

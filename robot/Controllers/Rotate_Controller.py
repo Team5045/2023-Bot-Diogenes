@@ -3,7 +3,6 @@ from magicbot import tunable
 from networktables import NetworkTables
 from components.boom import Boom
 from ctre import WPI_TalonFX
-from robotpy import d
 
 class Rotate_Controller:
 
@@ -22,9 +21,6 @@ class Rotate_Controller:
             Kp = self.kP,
             Ki=self.kI,
             Kd=self.kD,
-            Kf=self.kF,
-            source = self.get_angle,
-            output = self.pid_Write_angle
         )
 
         self.angle_controller.setInputRange(-180, 180)
