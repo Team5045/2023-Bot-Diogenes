@@ -61,11 +61,11 @@ class SpartaBot(MagicRobot):
     # a DriveTrain instance is automatically created by MagicRobot
 
     drivetrain: DriveTrain
-    boom_arm: Boom
+    # boom_arm: Boom
     grabber: Grabber
     gyro: Gyro
-    test: Rotate_Controller
-    boom_controller: BoomController
+    # test: Rotate_Controller
+    # boom_controller: BoomController
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -95,7 +95,9 @@ class SpartaBot(MagicRobot):
         self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
             4, MOTOR_BRUSHLESS)
         self.boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder = self.boom_extender_motor.getEncoder()
-        self.boom_rotator_motor = WPI_TalonFX(3)
+
+        self.boom_rotator_motor1: WPI_TalonFX = WPI_TalonFX(5)
+        self.boom_rotator_motor2: WPI_TalonFX = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
@@ -128,7 +130,7 @@ class SpartaBot(MagicRobot):
     def teleopInit(self):
         self.sd.putValue("Mode", "Teleop")
         self.boom_extender_motor_encoder.setPosition(0)
-        self.boom_rotator_motor.setSelectedSensorPosition(0)
+        # self.boom_rotator_motor.setSelectedSensorPosition(0)
         self.armPID.reset()
         # self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
@@ -142,12 +144,12 @@ class SpartaBot(MagicRobot):
         NOTE: all components' execute() methods will be called automatically
         '''
 
-        if (not self.armPID.atSetpoint()):
-            self.armPID.setSetpoint(self.pidTarget)
-            # self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
-            self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
-        else:
-            self.pidOutput = 0
+        # if (not self.armPID.atSetpoint()):
+        #     self.armPID.setSetpoint(self.pidTarget)
+        #     # self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
+        #     self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
+        # else:
+        #     self.pidOutput = 0
 
         # drive controls
         # print("tele")
@@ -212,16 +214,16 @@ class SpartaBot(MagicRobot):
 
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        rot_speed = 0
+        # rot_speed = 0
 
-        rot_speed += self.drive_controller.getRightTriggerAxis()
-        rot_speed -= self.drive_controller.getLeftTriggerAxis()
+        # rot_speed += self.drive_controller.getRightTriggerAxis()
+        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed / 5)
-            self.boom_controller.use_current_setpoint()
-        else:
-            self.boom_controller.goto_setpoint()
+        # if (abs(rot_speed) > INPUT_SENSITIVITY):
+        #     self.boom_arm.set_rotator(rot_speed / 5)
+        #     self.boom_controller.use_current_setpoint()
+        # else:
+        #     self.boom_controller.goto_setpoint()
 
         # pidTarget = -10000
 
@@ -233,20 +235,20 @@ class SpartaBot(MagicRobot):
         # if self.drive_controller.getYButton():
         #     self.boom_arm.set_rotator(self.pidOutput)
 
-        self.sd.putValue("rotator encoder", self.boom_rotator_motor.getSelectedSensorPosition())
-        self.sd.putValue("rotator pid", self.pidOutput)
+        # self.sd.putValue("rotator encoder", self.boom_rotator_motor.getSelectedSensorPosition())
+        # self.sd.putValue("rotator pid", self.pidOutput)
 
-        # boom extension: bumpers
-        # NOTE: it is assumed that the boom arm is fully retracted
-        wind_speed = 0
+        # # boom extension: bumpers
+        # # NOTE: it is assumed that the boom arm is fully retracted
+        # wind_speed = 0
 
-        if (self.drive_controller.getRightBumper()):
-            wind_speed -= WINDING_SPEED
+        # if (self.drive_controller.getRightBumper()):
+        #     wind_speed -= WINDING_SPEED
 
-        if (self.drive_controller.getLeftBumper()):
-            wind_speed += WINDING_SPEED
+        # if (self.drive_controller.getLeftBumper()):
+        #     wind_speed += WINDING_SPEED
 
-        self.boom_arm.set_extender(wind_speed, self.boom_extender_motor_encoder)
+        # self.boom_arm.set_extender(wind_speed, self.boom_extender_motor_encoder)
 
         # grabber: A button to open/close (switches from one state to another)
         if self.drive_controller.getAButtonReleased():
@@ -269,19 +271,33 @@ class SpartaBot(MagicRobot):
         #     self.talon_R_2.setNeutralMode(BRAKE_MODE)
         # get hacked!
 
-        if self.drive_controller.getXButton():
-            self.gyro.balancing()
+        # if self.drive_controller.getXButton():
+        #     self.boom_rotator_motor1.set(.4)
+        #     self.boom_rotator_motor2.set(.4)
+        # else:
+        #     self.boom_rotator_motor1.set(0)
+        #     self.boom_rotator_motor2.set(0)
+        rot_speed = 0
+
+        rot_speed += self.drive_controller.getRightTriggerAxis()
+        rot_speed -= self.drive_controller.getLeftTriggerAxis()
+
+        if (abs(rot_speed) > INPUT_SENSITIVITY):
+            self.boom_rotator_motor2.set(rot_speed)
+            self.boom_rotator_motor1.set(rot_speed)
+        else:
+            self.boom_rotator_motor2.set(0)
+            self.boom_rotator_motor1.set(0)
+        print(rot_speed)
 
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
 
-        if self.drive_controller.getXButton():
-            self.gyro.balancing()
         if self.drive_controller.getStartButtonReleased():
             self.gyro.reset()
 
-        if self.drive_controller.getBackButtonReleased():
-            self.encoder.getValues()
+        # if self.drive_controller.getBackButtonReleased():
+        #     self.encoder.getValues()
             
             
 
