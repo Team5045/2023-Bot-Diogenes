@@ -1,11 +1,11 @@
 import math
 from wpimath.controller import PIDController
-from magicbot import tunable
-from networktables import NetworkTable
-from ctre import WPI_TalonFX
-
 from components.boom import Boom
 
+
+
+PICKUP_LOCATION  = None
+DROPOFF_LOCATION = None
 
 
 def sigmoid(x):
