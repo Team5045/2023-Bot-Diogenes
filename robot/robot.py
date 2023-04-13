@@ -97,6 +97,9 @@ class SpartaBot(MagicRobot):
         self.boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder = self.boom_extender_motor.getEncoder()
         self.boom_rotator_motor = WPI_TalonFX(3)
 
+#   top right - 5 (new arm falcons)
+#   top left - 3
+
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
         self.talon_R_1.setNeutralMode(COAST_MODE)
