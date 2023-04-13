@@ -3,6 +3,8 @@ from ctre import WPI_TalonFX
 from networktables import NetworkTable
 from tools.utils import Lim
 
+from wpilib import MotorControllerGroup
+
 # from components.encoders import encoders
 
 CHAIN_LEN = 40  # (encoder ticks)
@@ -11,7 +13,8 @@ BUFFER_DISTANCE = 2  # (encoder ticks)
 
 class Boom:
     boom_extender_motor: rev.CANSparkMax
-    boom_rotator_motor: WPI_TalonFX
+    boom_rotator_motor1: WPI_TalonFX
+    boom_rotator_motor2: WPI_TalonFX
 
     sd: NetworkTable
 
@@ -19,8 +22,13 @@ class Boom:
 
     def setup(self):
         """instead of __init__(), use setup() to initialize values (works with magicrobot variable injection)"""
+        self.rotation_motors: MotorControllerGroup = MotorControllerGroup(
+            self.boom_rotator_motor1, self.boom_rotator_motor2
+        )
+
         self.extender_speed = 0
         self.rotator_speed = 0
+
 
     def set_extender(self, motor_speed: float, encoder: rev.SparkMaxRelativeEncoder):
         if (motor_speed > 0):
@@ -55,9 +63,10 @@ class Boom:
         self.sd.putValue("Boom Rotator Speed: ", self.rotator_speed)
 
     def get_arm_angle(self):
-        return self.boom_rotator_motor.getSelectedSensorPosition()
+        # NOTE: dunno if position of both motors need to be taken into account, or if one is fine
+        return self.boom_rotator_motor1.getSelectedSensorPosition()
 
     def execute(self):
         self.boom_extender_motor.set(self.extender_speed)
-        self.boom_rotator_motor.set(self.rotator_speed)
+        self.rotation_motors.set(self.rotator_speed)
         
