@@ -91,7 +91,8 @@ class SpartaBot(MagicRobot):
         self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
             4, MOTOR_BRUSHLESS)
         self.boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder = self.boom_extender_motor.getEncoder()
-        self.boom_rotator_motor = WPI_TalonFX(3)
+        self.boom_rotator_motor1 = WPI_TalonFX(3)
+        self.boom_rotator_motor2 = WPI_TalonFX(4)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
@@ -213,22 +214,45 @@ class SpartaBot(MagicRobot):
         rot_speed += self.drive_controller.getRightTriggerAxis()
         rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        self.boom_arm.set_rotator(0)
 
         # pidTarget = -10000
 
         # pidTarget += self.drive_controller.getRightTriggerAxis()
         # pidTarget -= self.drive_controller.getLeftTriggerAxis()
 
-
         if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed / 5)
+            self.boom_arm.set_rotator(rot_speed / 2)
+        else:
+            self.boom_arm.set_rotator(0)
 
-        # if self.drive_controller.getYButton():
-        #     self.boom_arm.set_rotator(self.pidOutput)
+        # Boom rotation PID
 
-        self.sd.putValue("rotator encoder", self.boom_rotator_motor.getSelectedSensorPosition())
-        self.sd.putValue("rotator pid", self.pidOutput)
+        # if (abs(self.drive_controller.getRightTriggerAxis()) > INPUT_SENSITIVITY or abs(
+        #         self.drive_controller.getLeftTriggerAxis()) > INPUT_SENSITIVITY):
+        #     self.pidTarget += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+        #     self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+        #     self.armPID.setSetpoint(self.pidTarget)
+        #     if not self.pidEnabled:
+        #         self.pidTarget = (
+        #                                      self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
+        #         self.armPID.setSetpoint(self.pidTarget)
+        #         self.pidEnabled = True
+        #         self.armPID.reset()
+        #
+        # if self.drive_controller.getYButtonReleased():
+        #     self.pidEnabled = not self.pidEnabled
+        #
+        # if self.pidEnabled:
+        #     self.pidOutput = self.armPID.calculate((
+        #                                                        self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+        #     # print("PID output: " + str(self.pidOutput))
+        #     # print("PID error: " + str(self.armPID.getPositionError()))
+        #     self.boom_rotator_motor2.set(self.pidOutput)
+        #     self.boom_rotator_motor1.set(self.pidOutput)
+        # else:
+        #     self.boom_rotator_motor2.set(0)
+        #     self.boom_rotator_motor1.set(0)
+        #     self.armPID.reset()
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted

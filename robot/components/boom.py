@@ -12,7 +12,8 @@ BUFFER_DISTANCE = 2  # (encoder ticks)
 
 class Boom:
     boom_extender_motor: rev.CANSparkMax
-    boom_rotator_motor: WPI_TalonFX
+    boom_rotator_motor1: WPI_TalonFX
+    boom_rotator_motor2: WPI_TalonFX
 
     sd: NetworkTable
 
@@ -57,5 +58,5 @@ class Boom:
 
     def execute(self):
         self.boom_extender_motor.set(self.extender_speed)
-        self.boom_rotator_motor.set(self.rotator_speed)
-        
+        self.boom_rotator_motor1.set(self.rotator_speed)
+        self.boom_rotator_motor2.set(self.rotator_speed)
