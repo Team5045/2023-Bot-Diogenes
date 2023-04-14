@@ -1,22 +1,17 @@
-import wpilib
 import rev
+import wpilib
+import wpilib.drive
+from ctre import NeutralMode
 from ctre import WPI_TalonFX
 from magicbot import MagicRobot
 from networktables import NetworkTables, NetworkTable
 from wpilib import DoubleSolenoid
-
-from components.drivetrain import DriveTrain
-from components.boom import Boom
-from components.grabber import Grabber
-from components.encoders import encoders
-import wpilib.drive
-from robotpy_ext.autonomous import AutonomousModeSelector
 from wpimath.controller import PIDController
 
+from components.boom import Boom
+from components.drivetrain import DriveTrain
+from components.grabber import Grabber
 from tools.utils import Lim
-
-from components.LimeLight import aiming
-from ctre import NeutralMode
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -161,7 +156,7 @@ class SpartaBot(MagicRobot):
 
         # print(self.drivetrain.speed)
 
-        # boom rotation: left/right triggers
+        # boom rotation: left/right triggers nopid
         rot_speed = 0
 
         rot_speed += self.drive_controller.getRightTriggerAxis()
@@ -170,8 +165,37 @@ class SpartaBot(MagicRobot):
         self.boom_arm.set_rotator(0)
 
         if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed/5)
+            self.boom_arm.set_rotator(rot_speed / 2)
             print(rot_speed)
+
+        # Boom rotation PID
+
+        # if (abs(self.drive_controller.getRightTriggerAxis()) > INPUT_SENSITIVITY or abs(
+        #         self.drive_controller.getLeftTriggerAxis()) > INPUT_SENSITIVITY):
+        #     self.pidTarget += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+        #     self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+        #     self.armPID.setSetpoint(self.pidTarget)
+        #     if not self.pidEnabled:
+        #         self.pidTarget = (
+        #                                      self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
+        #         self.armPID.setSetpoint(self.pidTarget)
+        #         self.pidEnabled = True
+        #         self.armPID.reset()
+        #
+        # if self.drive_controller.getYButtonReleased():
+        #     self.pidEnabled = not self.pidEnabled
+        #
+        # if self.pidEnabled:
+        #     self.pidOutput = self.armPID.calculate((
+        #                                                        self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+        #     # print("PID output: " + str(self.pidOutput))
+        #     # print("PID error: " + str(self.armPID.getPositionError()))
+        #     self.boom_rotator_motor2.set(self.pidOutput)
+        #     self.boom_rotator_motor1.set(self.pidOutput)
+        # else:
+        #     self.boom_rotator_motor2.set(0)
+        #     self.boom_rotator_motor1.set(0)
+        #     self.armPID.reset()
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
