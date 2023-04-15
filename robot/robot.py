@@ -39,7 +39,7 @@ py robot/robot.py deploy --skip-tests --no-version-check
 
 INPUT_SENSITIVITY = 0.05
 
-PID_TARGET_INPUT_MULTIPLIER
+PID_TARGET_INPUT_MULTIPLIER = 300
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
