@@ -37,8 +37,9 @@ python robot/robot.py deploy --skip-tests
 py robot/robot.py deploy --skip-tests --no-version-check
 '''
 
-
 INPUT_SENSITIVITY = 0.05
+
+PID_TARGET_INPUT_MULTIPLIER
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
@@ -106,9 +107,9 @@ class SpartaBot(MagicRobot):
         self.isbreaking = False
 
         # PID
-        self.armPID = PIDController(0.00005, 0.0001, 0, 0.02)
+        self.armPID = PIDController(0.00001, 0.00006, 0, 0.02)
         self.armPID.setTolerance(100)
-        self.pidTarget = -10000
+        self.pidTarget = 4000
         self.pidOutput = 0
         self.pidEnabled = False
 
@@ -246,11 +247,9 @@ class SpartaBot(MagicRobot):
                                                            self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
             # print("PID output: " + str(self.pidOutput))
             # print("PID error: " + str(self.armPID.getPositionError()))
-            self.boom_rotator_motor2.set(self.pidOutput)
-            self.boom_rotator_motor1.set(self.pidOutput)
+            self.boom_arm.set_rotator(self.pidOutput)
         else:
-            self.boom_rotator_motor2.set(0)
-            self.boom_rotator_motor1.set(0)
+            self.boom_arm.set_rotator(0)
             self.armPID.reset()
 
         # boom extension: bumpers
