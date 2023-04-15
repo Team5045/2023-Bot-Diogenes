@@ -6,7 +6,7 @@ from tools.utils import Lim
 # from components.encoders import encoders
 
 STRING_LEN = 28.5  # (inches)
-CHAIN_LEN = 40  # (encoder ticks)
+CHAIN_LEN = 35  # (encoder ticks)
 BUFFER_DISTANCE = 2  # (encoder ticks)
 
 

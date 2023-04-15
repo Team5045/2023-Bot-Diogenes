@@ -298,6 +298,15 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getBackButtonReleased():
             self.encoder.getValues()
+
+        self.sd.putValue("rotator 1 encoder", self.boom_rotator_motor1.getSelectedSensorPosition())
+        self.sd.putValue("rotator 2 encoder", self.boom_rotator_motor2.getSelectedSensorPosition())
+        self.sd.putValue("average rotator encoder", (
+                self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+        self.sd.putValue("rotator pid error", self.armPID.getPositionError())
+        self.sd.putValue("rotator pid target", self.pidTarget)
+        self.sd.putValue("rotator pid", self.pidOutput)
+        self.sd.putValue("pid enabled", self.pidEnabled)
             
             
 
