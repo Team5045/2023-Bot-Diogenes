@@ -40,8 +40,9 @@ python robot/robot.py deploy --skip-tests
 py robot/robot.py deploy --skip-tests --no-version-check
 '''
 
-
 INPUT_SENSITIVITY = 0.05
+
+PID_TARGET_INPUT_MULTIPLIER = 1000
 
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
@@ -95,12 +96,8 @@ class SpartaBot(MagicRobot):
         self.boom_extender_motor: rev.CANSparkMax = rev.CANSparkMax(
             4, MOTOR_BRUSHLESS)
         self.boom_extender_motor_encoder: rev.SparkMaxRelativeEncoder = self.boom_extender_motor.getEncoder()
-
-        self.boom_rotator_motor1 = WPI_TalonFX(3)
-        self.boom_rotator_motor2 = WPI_TalonFX(5)
-
-#   top right - 5 (new arm falcons)
-#   top left - 3
+        self.boom_rotator_motor1 = WPI_TalonFX(5)
+        self.boom_rotator_motor2 = WPI_TalonFX(3)
 
         self.talon_L_1.setNeutralMode(COAST_MODE)
         self.talon_L_2.setNeutralMode(COAST_MODE)
@@ -134,6 +131,7 @@ class SpartaBot(MagicRobot):
         self.sd.putValue("Mode", "Teleop")
         self.boom_extender_motor_encoder.setPosition(0)
         self.boom_rotator_motor1.setSelectedSensorPosition(0)
+        self.boom_rotator_motor2.setSelectedSensorPosition(0)
         self.armPID.reset()
         # self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
@@ -150,7 +148,7 @@ class SpartaBot(MagicRobot):
         # if (not self.armPID.atSetpoint()):
         #     self.armPID.setSetpoint(self.pidTarget)
         #     # self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
-        #     self.pidOutput = self.armPID.calculate(self.boom_rotator_motor1.getSelectedSensorPosition())
+        #     self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
         # else:
         #     self.pidOutput = 0
 
@@ -217,29 +215,45 @@ class SpartaBot(MagicRobot):
 
         '''BOOM AND GRABBER COMMENTED OUT'''
         # boom rotation: left/right triggers
-        rot_speed = 0
-
-        rot_speed += self.drive_controller.getRightTriggerAxis()
-        rot_speed -= self.drive_controller.getLeftTriggerAxis()
-
-        if (abs(rot_speed) > INPUT_SENSITIVITY):
-            self.boom_arm.set_rotator(rot_speed / 5)
-            self.boom_controller.use_current_setpoint()
-        else:
-            self.boom_controller.goto_setpoint()
-
-        # pidTarget = -10000
+        # rot_speed = 0
+        # #
+        # rot_speed += self.drive_controller.getRightTriggerAxis()
+        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
         # pidTarget += self.drive_controller.getRightTriggerAxis()
         # pidTarget -= self.drive_controller.getLeftTriggerAxis()
 
+        # if (abs(rot_speed) > INPUT_SENSITIVITY):
+        #     self.boom_arm.set_rotator(rot_speed / 5)
+        # else:
+        #     self.boom_arm.set_rotator(0)
 
+        # Boom rotation PID
 
-        # if self.drive_controller.getYButton():
-        #     self.boom_arm.set_rotator(self.pidOutput)
+        if (abs(self.drive_controller.getRightTriggerAxis()) > INPUT_SENSITIVITY or abs(
+                self.drive_controller.getLeftTriggerAxis()) > INPUT_SENSITIVITY):
+            self.pidTarget += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+            self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+            self.armPID.setSetpoint(self.pidTarget)
+            if not self.pidEnabled:
+                self.pidTarget = (
+                                         self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
+                self.armPID.setSetpoint(self.pidTarget)
+                self.pidEnabled = True
+                self.armPID.reset()
 
-        self.sd.putValue("rotator encoder", self.boom_arm.get_arm_angle())
-        # self.sd.putValue("rotator pid", self.pidOutput)
+        if self.drive_controller.getYButtonReleased():
+            self.pidEnabled = not self.pidEnabled
+            if self.pidEnabled:
+                self.armPID.setSetpoint(self.pidTarget)
+
+        if self.pidEnabled:
+            self.pidOutput = self.armPID.calculate((
+                                                           self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+            self.boom_arm.set_rotator(self.pidOutput)
+        else:
+            self.boom_arm.set_rotator(0)
+            self.armPID.reset()
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
@@ -287,6 +301,15 @@ class SpartaBot(MagicRobot):
 
         if self.drive_controller.getBackButtonReleased():
             self.encoder.getValues()
+
+        self.sd.putValue("rotator 1 encoder", self.boom_rotator_motor1.getSelectedSensorPosition())
+        self.sd.putValue("rotator 2 encoder", self.boom_rotator_motor2.getSelectedSensorPosition())
+        self.sd.putValue("average rotator encoder", (
+                self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+        self.sd.putValue("rotator pid error", self.armPID.getPositionError())
+        self.sd.putValue("rotator pid target", self.pidTarget)
+        self.sd.putValue("rotator pid", self.pidOutput)
+        self.sd.putValue("pid enabled", self.pidEnabled)
             
             
 
