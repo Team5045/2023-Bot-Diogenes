@@ -233,8 +233,7 @@ class SpartaBot(MagicRobot):
             self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
             self.armPID.setSetpoint(self.pidTarget)
             if not self.pidEnabled:
-                self.pidTarget = (
-                                         self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
+                self.pidTarget = (self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
                 self.armPID.setSetpoint(self.pidTarget)
                 self.pidEnabled = True
                 self.armPID.reset()
@@ -245,8 +244,7 @@ class SpartaBot(MagicRobot):
                 self.armPID.setSetpoint(self.pidTarget)
 
         if self.pidEnabled:
-            self.pidOutput = self.armPID.calculate((
-                                                           self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+            self.pidOutput = self.armPID.calculate((self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
             self.boom_arm.set_rotator(self.pidOutput)
         else:
             self.boom_arm.set_rotator(0)
