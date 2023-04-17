@@ -104,14 +104,19 @@ class SpartaBot(MagicRobot):
 
         self.navx = navx.AHRS.create_spi()
 
-        self.isbreaking = False
+        self.is_braking = False
 
         # PID
         self.armPID = PIDController(0.00001, 0.0001, 0.0001, 0.02)
         self.armPID.setTolerance(50)
-        self.pidTarget = -10000
-        self.pidOutput = 0
-        self.pidEnabled = False
+        self.arm_pid_target = -10000
+        self.arm_pid_output = 0
+        self.arm_pid_enabled = False
+
+        self.drivePID = PIDController(0.0001, 0, 0, 0.02)
+        self.drivePID.setTolerance(50)
+        
+
 
     def disabledInit(self) -> None:
         self.navx.reset()
@@ -143,52 +148,15 @@ class SpartaBot(MagicRobot):
         '''
 
         # if (not self.armPID.atSetpoint()):
-        #     self.armPID.setSetpoint(self.pidTarget)
-        #     # self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.pidTarget)
-        #     self.pidOutput = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
+        #     self.armPID.setSetpoint(self.arm_pid_target)
+        #     # self.arm_pid_output = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition(), self.arm_pid_target)
+        #     self.arm_pid_output = self.armPID.calculate(self.boom_rotator_motor.getSelectedSensorPosition())
         # else:
-        #     self.pidOutput = 0
+        #     self.arm_pid_output = 0
 
         # drive controls
         # print("tele")
-        angle = self.drive_controller.getRightX()
-        speed = self.drive_controller.getLeftY()
-
-        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
-            if self.isbreaking:
-                # print("setting coast mode")
-                self.talon_L_1.setNeutralMode(COAST_MODE)
-                self.talon_L_2.setNeutralMode(COAST_MODE)
-                self.talon_R_1.setNeutralMode(COAST_MODE)
-                self.talon_R_2.setNeutralMode(COAST_MODE)
-                self.isbreaking = False
-
-            self.drivetrain.set_motors(speed, -angle)
-
-            self.sd.putValue('Drivetrain: ', 'moving')
-            #
-            # self.talon_L_1.setNeutralMode(COAST_MODE)
-            # self.talon_L_2.setNeutralMode(COAST_MODE)
-            # self.talon_R_1.setNeutralMode(COAST_MODE)
-            # self.talon_R_2.setNeutralMode(COAST_MODE)
-
-        else:
-            if not self.isbreaking:
-                # print("setting brake mode")
-                self.talon_L_1.setNeutralMode(BRAKE_MODE)
-                self.talon_L_2.setNeutralMode(BRAKE_MODE)
-                self.talon_R_1.setNeutralMode(BRAKE_MODE)
-                self.talon_R_2.setNeutralMode(BRAKE_MODE)
-                self.isbreaking = True
-            # reset value to make robot stop moving
-            self.drivetrain.set_motors(0.0, 0.0)
-            #
-            # self.talon_L_1.setNeutralMode(BRAKE_MODE)
-            # self.talon_L_2.setNeutralMode(BRAKE_MODE)
-            # self.talon_R_1.setNeutralMode(BRAKE_MODE)
-            # self.talon_R_2.setNeutralMode(BRAKE_MODE)
-
-            self.sd.putValue('Drivetrain: ', 'static')
+        
 
         # mode = self.drivetrain.is_moving()
         #
@@ -217,8 +185,8 @@ class SpartaBot(MagicRobot):
         # rot_speed += self.drive_controller.getRightTriggerAxis()
         # rot_speed -= self.drive_controller.getLeftTriggerAxis()
 
-        # pidTarget += self.drive_controller.getRightTriggerAxis()
-        # pidTarget -= self.drive_controller.getLeftTriggerAxis()
+        # arm_pid_target += self.drive_controller.getRightTriggerAxis()
+        # arm_pid_target -= self.drive_controller.getLeftTriggerAxis()
 
         # if (abs(rot_speed) > INPUT_SENSITIVITY):
         #     self.boom_arm.set_rotator(rot_speed / 5)
@@ -229,26 +197,65 @@ class SpartaBot(MagicRobot):
 
         if (abs(self.drive_controller.getRightTriggerAxis()) > INPUT_SENSITIVITY or abs(
                 self.drive_controller.getLeftTriggerAxis()) > INPUT_SENSITIVITY):
-            self.pidTarget += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
-            self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
-            self.armPID.setSetpoint(self.pidTarget)
-            if not self.pidEnabled:
-                self.pidTarget = (self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
-                self.armPID.setSetpoint(self.pidTarget)
-                self.pidEnabled = True
+            self.arm_pid_target += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+            self.arm_pid_target -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
+            self.armPID.setSetpoint(self.arm_pid_target)
+            if not self.arm_pid_enabled:
+                self.arm_pid_target = (self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
+                self.armPID.setSetpoint(self.arm_pid_target)
+                self.arm_pid_enabled = True
                 self.armPID.reset()
 
         if self.drive_controller.getYButtonReleased():
-            self.pidEnabled = not self.pidEnabled
-            if self.pidEnabled:
-                self.armPID.setSetpoint(self.pidTarget)
+            self.arm_pid_enabled = not self.arm_pid_enabled
+            if self.arm_pid_enabled:
+                self.armPID.setSetpoint(self.arm_pid_target)
 
-        if self.pidEnabled:
-            self.pidOutput = self.armPID.calculate((self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
-            self.boom_arm.set_rotator(self.pidOutput)
+        if self.arm_pid_enabled:
+            self.arm_pid_output = self.armPID.calculate((self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+            self.boom_arm.set_rotator(self.arm_pid_output)
         else:
             self.boom_arm.set_rotator(0)
             self.armPID.reset()
+        
+        angle = self.drivePID.calculate(self.drive_controller.getRightX())
+        speed = self.drivePID.calculate(self.drive_controller.getLeftY())
+
+        if (abs(angle) > INPUT_SENSITIVITY or abs(speed) > INPUT_SENSITIVITY):
+            if self.is_braking:
+                # print("setting coast mode")
+                self.talon_L_1.setNeutralMode(COAST_MODE)
+                self.talon_L_2.setNeutralMode(COAST_MODE)
+                self.talon_R_1.setNeutralMode(COAST_MODE)
+                self.talon_R_2.setNeutralMode(COAST_MODE)
+                self.is_braking = False
+
+            self.drivetrain.set_motors(speed, -angle)
+
+            self.sd.putValue('Drivetrain: ', 'moving')
+            
+            # self.talon_L_1.setNeutralMode(COAST_MODE)
+            # self.talon_L_2.setNeutralMode(COAST_MODE)
+            # self.talon_R_1.setNeutralMode(COAST_MODE)
+            # self.talon_R_2.setNeutralMode(COAST_MODE)
+
+        else:
+            if not self.is_braking:
+                # print("setting brake mode")
+                self.talon_L_1.setNeutralMode(BRAKE_MODE)
+                self.talon_L_2.setNeutralMode(BRAKE_MODE)
+                self.talon_R_1.setNeutralMode(BRAKE_MODE)
+                self.talon_R_2.setNeutralMode(BRAKE_MODE)
+                self.is_braking = True
+            # reset value to make robot stop moving
+            self.drivetrain.set_motors(0.0, 0.0)
+            #
+            # self.talon_L_1.setNeutralMode(BRAKE_MODE)
+            # self.talon_L_2.setNeutralMode(BRAKE_MODE)
+            # self.talon_R_1.setNeutralMode(BRAKE_MODE)
+            # self.talon_R_2.setNeutralMode(BRAKE_MODE)
+
+            self.sd.putValue('Drivetrain: ', 'static')
 
         # boom extension: bumpers
         # NOTE: it is assumed that the boom arm is fully retracted
@@ -302,9 +309,9 @@ class SpartaBot(MagicRobot):
         self.sd.putValue("average rotator encoder", (
                 self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
         self.sd.putValue("rotator pid error", self.armPID.getPositionError())
-        self.sd.putValue("rotator pid target", self.pidTarget)
-        self.sd.putValue("rotator pid", self.pidOutput)
-        self.sd.putValue("pid enabled", self.pidEnabled)
+        self.sd.putValue("rotator pid target", self.arm_pid_target)
+        self.sd.putValue("rotator pid", self.arm_pid_output)
+        self.sd.putValue("pid enabled", self.arm_pid_enabled)
             
             
 
