@@ -14,6 +14,7 @@ from components.drivetrain import DriveTrain
 from components.encoders import Encoder
 from components.grabber import Grabber
 from components.gyro import Gyro
+from controllers.boom_controller import BoomController
 
 # Download and install stuff on the RoboRIO after imaging
 '''
@@ -41,6 +42,8 @@ INPUT_SENSITIVITY = 0.05
 
 PID_TARGET_INPUT_MULTIPLIER = 1000
 
+PID_FRONT_TARGET_LIMIT = -90000
+
 PNEUMATICS_MODULE_TYPE = wpilib.PneumaticsModuleType.CTREPCM
 MOTOR_BRUSHED = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushed
 MOTOR_BRUSHLESS = rev._rev.CANSparkMaxLowLevel.MotorType.kBrushless
@@ -63,6 +66,7 @@ class SpartaBot(MagicRobot):
     grabber: Grabber
     gyro: Gyro
     encoder: Encoder
+    boom_controller: BoomController
 
     def createObjects(self):
         '''Create motors and stuff here'''
@@ -107,7 +111,7 @@ class SpartaBot(MagicRobot):
         self.isbreaking = False
 
         # PID
-        self.armPID = PIDController(0.00001, 0.0001, 0.0001, 0.02)
+        self.armPID = PIDController(0.00002, 0.00004, 0.000001, 0.02)
         self.armPID.setTolerance(50)
         self.pidTarget = -10000
         self.pidOutput = 0
@@ -130,6 +134,9 @@ class SpartaBot(MagicRobot):
         self.boom_rotator_motor1.setSelectedSensorPosition(0)
         self.boom_rotator_motor2.setSelectedSensorPosition(0)
         self.armPID.reset()
+        self.pidTarget = -3000
+        self.pidOutput = 0
+        self.pidEnabled = False
         # self.compressor.disable()
         # self.limelight = NetworkTables.getTable("limelight")
         # self.limelight.LEDState(3)
@@ -210,43 +217,21 @@ class SpartaBot(MagicRobot):
         #
         # self.prev_mode_moving = mode
 
-        '''BOOM AND GRABBER COMMENTED OUT'''
-        # boom rotation: left/right triggers
-        # rot_speed = 0
-        # #
-        # rot_speed += self.drive_controller.getRightTriggerAxis()
-        # rot_speed -= self.drive_controller.getLeftTriggerAxis()
-
-        # pidTarget += self.drive_controller.getRightTriggerAxis()
-        # pidTarget -= self.drive_controller.getLeftTriggerAxis()
-
-        # if (abs(rot_speed) > INPUT_SENSITIVITY):
-        #     self.boom_arm.set_rotator(rot_speed / 5)
-        # else:
-        #     self.boom_arm.set_rotator(0)
-
-        # Boom rotation PID
-
+        '''SEE BOOM_CONTROLLER FOR MORE INFO'''
         if (abs(self.drive_controller.getRightTriggerAxis()) > INPUT_SENSITIVITY or abs(
                 self.drive_controller.getLeftTriggerAxis()) > INPUT_SENSITIVITY):
             self.pidTarget += self.drive_controller.getRightTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
             self.pidTarget -= self.drive_controller.getLeftTriggerAxis() * PID_TARGET_INPUT_MULTIPLIER
-            self.armPID.setSetpoint(self.pidTarget)
-            if not self.pidEnabled:
-                self.pidTarget = (
-                                         self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2
-                self.armPID.setSetpoint(self.pidTarget)
-                self.pidEnabled = True
-                self.armPID.reset()
+            self.boom_controller.set_target(self.pidTarget)
 
+        '''BELOW IS TO ENABLE PID, SEE THE FILE'''
         if self.drive_controller.getYButtonReleased():
-            self.pidEnabled = not self.pidEnabled
-            if self.pidEnabled:
-                self.armPID.setSetpoint(self.pidTarget)
-
+            self.boom_controller.toggle_pid()
+            
+        '''PID IN ENABLED CONDITION'''
         if self.pidEnabled:
             self.pidOutput = self.armPID.calculate((
-                                                           self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
+                self.boom_rotator_motor1.getSelectedSensorPosition() + self.boom_rotator_motor2.getSelectedSensorPosition()) / 2)
             self.boom_arm.set_rotator(self.pidOutput)
         else:
             self.boom_arm.set_rotator(0)
