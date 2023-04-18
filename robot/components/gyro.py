@@ -6,12 +6,21 @@ import ctre
 import networktables
 from networktables import NetworkTable
 from magicbot import MagicRobot
+from ctre import WPI_TalonFX
+from ctre import NeutralMode
 # Various imports
+
+BRAKE_MODE = NeutralMode(2)
+COAST_MODE = NeutralMode(1)
 
 class Gyro():
     # MagicBot Variable Injection
     sd: networktables.NetworkTable
     drivetrain: DriveTrain
+    talon_L_1: WPI_TalonFX
+    talon_L_2: WPI_TalonFX
+    talon_R_1: WPI_TalonFX
+    talon_R_2: WPI_TalonFX
     
     def setup(self):
         self.navx = navx.AHRS.create_spi()
@@ -50,6 +59,11 @@ class Gyro():
                     self.sd.putValue("Mode: ", "Balanced!")
                     print("balanced!")
                     print(self.navx.getPitch())
+                    # Braking after balancing :)
+                    self.talon_L_1.setNeutralMode(BRAKE_MODE)
+                    self.talon_L_2.setNeutralMode(BRAKE_MODE)
+                    self.talon_R_1.setNeutralMode(BRAKE_MODE)
+                    self.talon_R_2.setNeutralMode(BRAKE_MODE)
                     # Balanced
             else:
                 # In this case: Either bot is flipped, or error values
